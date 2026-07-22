@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Create a HealthVault staff account"
+    >
+
+    <title>Register | HealthVault</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/accessibility.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+    <main class="auth-container">
+        <section class="auth-sidebar">
+            <div class="auth-sidebar-logo">
+                <div class="brand-icon">
+                    <span aria-hidden="true">✚</span>
+                </div>
+
+                <h1>HealthVault</h1>
+            </div>
+
+            <div class="auth-sidebar-content">
+                <h2>
+                    Better information supports better care.
+                </h2>
+
+                <p>
+                    Create a secure staff account to manage resident
+                    profiles, emergency details, medications, medical
+                    records, and AI-generated summaries.
+                </p>
+            </div>
+        </section>
+
+        <section class="auth-form-panel">
+            <div class="auth-card">
+                <header class="auth-header">
+                    <h3>Create account</h3>
+
+                    <p>
+                        Register for access to the HealthVault
+                        staff dashboard.
+                    </p>
+                </header>
+
+                <div
+                    id="registerMessage"
+                    class="alert"
+                    role="alert"
+                    aria-live="polite"
+                    hidden
+                ></div>
+
+                <form id="registerForm" novalidate>
+                    <div class="form-group">
+                        <label for="name">
+                            Full name
+                        </label>
+
+                        <div class="input-wrapper">
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                class="form-input"
+                                placeholder="Enter your full name"
+                                autocomplete="name"
+                                minlength="2"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">
+                            Email address
+                        </label>
+
+                        <div class="input-wrapper">
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="form-input"
+                                placeholder="staff@example.com"
+                                autocomplete="email"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            Password
+                        </label>
+
+                        <div class="input-wrapper">
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-input"
+                                placeholder="Create a password"
+                                autocomplete="new-password"
+                                minlength="8"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">
+                            Confirm password
+                        </label>
+
+                        <div class="input-wrapper">
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                class="form-input"
+                                placeholder="Enter the password again"
+                                autocomplete="new-password"
+                                minlength="8"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="auth-actions">
+                        <label class="remember-me">
+                            <input
+                                type="checkbox"
+                                id="showPasswords"
+                            >
+
+                            Show passwords
+                        </label>
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary btn-submit"
+                        id="registerBtn"
+                    >
+                        Create account
+                    </button>
+                </form>
+
+                <footer class="auth-footer">
+                    <p>
+                        Already have an account?
+
+                        <a href="login.html">
+                            Sign in
+                        </a>
+                    </p>
+                </footer>
+            </div>
+        </section>
+    </main>
+
+    <div class="accessibility-widget">
+        <div
+            class="access-menu"
+            id="accessibilityMenu"
+            aria-label="Accessibility settings"
+        >
+            <p class="access-title">
+                Accessibility
+            </p>
+
+            <div class="access-row">
+                <label for="contrastToggleBtn">
+                    High contrast
+                </label>
+
+                <button
+                    type="button"
+                    class="access-toggle-btn"
+                    id="contrastToggleBtn"
+                    aria-pressed="false"
+                >
+                    Enable
+                </button>
+            </div>
+
+            <div class="access-row">
+                <span>Text size</span>
+
+                <div class="access-btn-group">
+                    <button
+                        type="button"
+                        class="access-btn"
+                        id="decreaseTextBtn"
+                        aria-label="Decrease text size"
+                    >
+                        A−
+                    </button>
+
+                    <output id="fontSizeOutput">
+                        100%
+                    </output>
+
+                    <button
+                        type="button"
+                        class="access-btn"
+                        id="increaseTextBtn"
+                        aria-label="Increase text size"
+                    >
+                        A+
+                    </button>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                class="btn btn-outline"
+                id="resetAccessibilityBtn"
+            >
+                Reset settings
+            </button>
+        </div>
+
+        <button
+            type="button"
+            class="access-trigger"
+            id="accessibilityTrigger"
+            aria-label="Open accessibility settings"
+            aria-expanded="false"
+        >
+            ♿
+        </button>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/accessibility.js"></script>
+    <script src="js/auth/register.js"></script>
+</body>
+</html>

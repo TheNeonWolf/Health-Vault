@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Manage HealthVault resident profiles"
+    >
+
+    <title>Residents | HealthVault</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/residents.css">
+    <link rel="stylesheet" href="css/accessibility.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+    <aside>
+        <div class="brand">
+            <div class="brand-icon" aria-hidden="true">
+                ✚
+            </div>
+
+            <div class="brand-text">
+                <h1>HealthVault</h1>
+                <span>Resident Care</span>
+            </div>
+        </div>
+
+        <nav aria-label="Main navigation">
+            <a
+                href="dashboard.html"
+                class="nav-item"
+            >
+                <span aria-hidden="true">▦</span>
+                Dashboard
+            </a>
+
+            <a
+                href="residents.html"
+                class="nav-item active"
+                aria-current="page"
+            >
+                <span aria-hidden="true">👥</span>
+                Residents
+            </a>
+
+            <a
+                href="profile.html"
+                class="nav-item"
+            >
+                <span aria-hidden="true">●</span>
+                Profile
+            </a>
+        </nav>
+
+        <div class="user-panel">
+            <div
+                class="user-avatar"
+                id="sidebarUserInitials"
+                aria-hidden="true"
+            >
+                HV
+            </div>
+
+            <div class="user-info">
+                <span
+                    class="user-name"
+                    id="sidebarUserName"
+                >
+                    Loading...
+                </span>
+
+                <span class="user-plan">
+                    Care staff
+                </span>
+            </div>
+        </div>
+    </aside>
+
+    <main>
+        <header>
+            <div>
+                <p class="residents-header-label">
+                    Resident management
+                </p>
+
+                <h2>Residents</h2>
+            </div>
+
+            <div class="header-status">
+                <span class="status-badge">
+                    <span aria-hidden="true">●</span>
+                    Secure session
+                </span>
+
+                <button
+                    type="button"
+                    class="btn btn-outline"
+                    id="logoutBtn"
+                >
+                    Log out
+                </button>
+            </div>
+        </header>
+
+        <section class="content-body">
+            <div
+                id="residentsMessage"
+                class="alert"
+                role="alert"
+                aria-live="polite"
+                hidden
+            ></div>
+
+            <section class="residents-toolbar">
+                <div>
+                    <h1>Resident directory</h1>
+
+                    <p>
+                        Search, add, and manage resident profiles.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn btn-accent"
+                    id="openAddResidentBtn"
+                >
+                    <span aria-hidden="true">＋</span>
+                    Add resident
+                </button>
+            </section>
+
+            <section class="residents-controls">
+                <div class="resident-search-wrapper">
+                    <span
+                        class="resident-search-icon"
+                        aria-hidden="true"
+                    >
+                        🔍
+                    </span>
+
+                    <input
+                        type="search"
+                        id="residentSearchInput"
+                        class="resident-search-input"
+                        placeholder="Search by name, room, condition, or support need"
+                        aria-label="Search residents"
+                    >
+                </div>
+
+                <select
+                    id="residentSortSelect"
+                    class="resident-sort-select"
+                    aria-label="Sort residents"
+                >
+                    <option value="name-asc">
+                        Name: A to Z
+                    </option>
+
+                    <option value="name-desc">
+                        Name: Z to A
+                    </option>
+
+                    <option value="room-asc">
+                        Room number
+                    </option>
+
+                    <option value="age-asc">
+                        Age: youngest first
+                    </option>
+
+                    <option value="age-desc">
+                        Age: oldest first
+                    </option>
+                </select>
+            </section>
+
+            <section
+                class="resident-summary-row"
+                aria-label="Resident summary"
+            >
+                <article class="resident-summary-card">
+                    <span>Total residents</span>
+
+                    <strong id="residentCount">
+                        0
+                    </strong>
+                </article>
+
+                <article class="resident-summary-card">
+                    <span>With emergency profile</span>
+
+                    <strong id="emergencyProfileCount">
+                        0
+                    </strong>
+                </article>
+
+                <article class="resident-summary-card">
+                    <span>Search results</span>
+
+                    <strong id="searchResultCount">
+                        0
+                    </strong>
+                </article>
+            </section>
+
+            <section
+                class="residents-grid"
+                id="residentsGrid"
+                aria-live="polite"
+            >
+                <div class="residents-loading-state">
+                    Loading residents...
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <!-- Add/Edit Resident Modal -->
+    <div
+        class="modal-backdrop"
+        id="residentFormModal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="residentModalTitle"
+    >
+        <div class="modal-box resident-modal-box">
+            <button
+                type="button"
+                class="modal-close"
+                id="closeResidentModalBtn"
+                aria-label="Close resident form"
+            >
+                ✕
+            </button>
+
+            <div class="modal-header">
+                <p class="modal-eyebrow">
+                    Resident profile
+                </p>
+
+                <h3 id="residentModalTitle">
+                    Add resident
+                </h3>
+            </div>
+
+            <div
+                id="residentFormMessage"
+                class="alert"
+                role="alert"
+                aria-live="polite"
+                hidden
+            ></div>
+
+            <form id="residentForm" novalidate>
+                <input
+                    type="hidden"
+                    id="residentId"
+                >
+
+                <div class="resident-form-grid">
+                    <div class="form-group resident-form-full">
+                        <label for="residentName">
+                            Full name
+                            <span class="required-star" aria-hidden="true">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="residentName"
+                            class="form-input"
+                            placeholder="Enter resident's full name"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="residentAge">
+                            Age
+                            <span class="required-star" aria-hidden="true">*</span>
+                        </label>
+
+                        <input
+                            type="number"
+                            id="residentAge"
+                            class="form-input"
+                            placeholder="Age"
+                            min="0"
+                            max="130"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="roomNumber">
+                            Room number
+                            <span class="required-star" aria-hidden="true">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="roomNumber"
+                            class="form-input"
+                            placeholder="Example: A-12"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="emergencyContactName">
+                            Emergency contact name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="emergencyContactName"
+                            class="form-input"
+                            placeholder="Contact name"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="emergencyContactPhone">
+                            Emergency contact phone
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="emergencyContactPhone"
+                            class="form-input"
+                            placeholder="Phone number"
+                        >
+                    </div>
+
+                    <div class="form-group resident-form-full">
+                        <label for="supportNeeds">
+                            Support needs
+                        </label>
+
+                        <textarea
+                            id="supportNeeds"
+                            class="form-input resident-textarea"
+                            placeholder="Mobility, communication, daily living, or other support needs"
+                            rows="3"
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group resident-form-full">
+                        <label for="allergies">
+                            Allergies
+                        </label>
+
+                        <textarea
+                            id="allergies"
+                            class="form-input resident-textarea"
+                            placeholder="List known allergies or enter None"
+                            rows="2"
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group resident-form-full">
+                        <label for="residentNotes">
+                            Notes
+                        </label>
+
+                        <textarea
+                            id="residentNotes"
+                            class="form-input resident-textarea"
+                            placeholder="Additional care notes"
+                            rows="3"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <div class="resident-modal-actions">
+                    <button
+                        type="button"
+                        class="btn btn-outline"
+                        id="cancelResidentBtn"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                        id="saveResidentBtn"
+                    >
+                        Save resident
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div
+        class="modal-backdrop"
+        id="deleteResidentModal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="deleteResidentTitle"
+    >
+        <div class="modal-box delete-resident-modal-box">
+            <div class="delete-warning-icon" aria-hidden="true">
+                !
+            </div>
+
+            <div class="modal-header">
+                <h3 id="deleteResidentTitle">
+                    Delete resident?
+                </h3>
+            </div>
+
+            <div class="modal-body">
+                <p>
+                    You are about to delete
+                    <strong id="deleteResidentName">
+                        this resident
+                    </strong>.
+                </p>
+
+                <p class="delete-warning-text">
+                    This action cannot be undone.
+                </p>
+            </div>
+
+            <div class="resident-modal-actions">
+                <button
+                    type="button"
+                    class="btn btn-outline"
+                    id="cancelDeleteResidentBtn"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="button"
+                    class="btn resident-delete-confirm-btn"
+                    id="confirmDeleteResidentBtn"
+                >
+                    Delete resident
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="accessibility-widget">
+        <div
+            class="access-menu"
+            id="accessibilityMenu"
+            aria-label="Accessibility settings"
+        >
+            <p class="access-title">
+                Accessibility
+            </p>
+
+            <div class="access-row">
+                <label for="contrastToggleBtn">
+                    High contrast
+                </label>
+
+                <button
+                    type="button"
+                    class="access-toggle-btn"
+                    id="contrastToggleBtn"
+                    aria-pressed="false"
+                >
+                    Enable
+                </button>
+            </div>
+
+            <div class="access-row">
+                <span>Text size</span>
+
+                <div class="access-btn-group">
+                    <button
+                        type="button"
+                        class="access-btn"
+                        id="decreaseTextBtn"
+                        aria-label="Decrease text size"
+                    >
+                        A−
+                    </button>
+
+                    <output id="fontSizeOutput">
+                        100%
+                    </output>
+
+                    <button
+                        type="button"
+                        class="access-btn"
+                        id="increaseTextBtn"
+                        aria-label="Increase text size"
+                    >
+                        A+
+                    </button>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                class="btn btn-outline"
+                id="resetAccessibilityBtn"
+            >
+                Reset settings
+            </button>
+        </div>
+
+        <button
+            type="button"
+            class="access-trigger"
+            id="accessibilityTrigger"
+            aria-label="Open accessibility settings"
+            aria-expanded="false"
+        >
+            ♿
+        </button>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/accessibility.js"></script>
+    <script src="js/pages/residents.js"></script>
+</body>
+</html>

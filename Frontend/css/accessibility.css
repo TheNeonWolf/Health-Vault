@@ -1,0 +1,201 @@
+/* HIGH CONTRAST MODE GLOBAL OVERRIDES */
+body.high-contrast {
+  --navy-dark: #000000;
+  --navy-light: #111111;
+  --coral-accent: #ffff00;
+  --coral-hover: #ffcc00;
+  --bg-cream: #000000;
+  --teal-light: #000000;
+  --teal-dark: #ffffff;
+  --beige-light: #000000;
+  --peach-light: #000000;
+  --white: #000000;
+  --text-dark: #ffffff;
+  --text-muted: #ffffff;
+  --border-light: #ffffff;
+  
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+body.high-contrast * {
+  border-color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+body.high-contrast aside {
+  background-color: #000000 !important;
+  border-right: 2px solid #ffffff !important;
+}
+
+body.high-contrast main {
+  background-color: #000000 !important;
+}
+
+body.high-contrast header {
+  background-color: #000000 !important;
+  border-bottom: 2px solid #ffffff !important;
+}
+
+body.high-contrast .nav-item {
+  color: #ffffff !important;
+  opacity: 0.8 !important;
+}
+
+body.high-contrast .nav-item.active {
+  background-color: #ffff00 !important;
+  color: #000000 !important;
+  font-weight: 900 !important;
+  border-left: 6px solid #ffffff !important;
+}
+
+body.high-contrast .nav-item:hover {
+  background-color: #111111 !important;
+}
+
+body.high-contrast .nav-item svg {
+  color: inherit !important;
+}
+
+body.high-contrast .btn-primary {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+}
+
+body.high-contrast .btn-primary:hover {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+body.high-contrast .btn-accent {
+  background-color: #ffff00 !important;
+  color: #000000 !important;
+  border: 2px solid #000000 !important;
+}
+
+body.high-contrast .btn-accent:hover {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+body.high-contrast .btn-outline {
+  border: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+
+body.high-contrast .btn-outline:hover {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+body.high-contrast .stat-card, 
+body.high-contrast .panel, 
+body.high-contrast .activity-item,
+body.high-contrast .profile-card,
+body.high-contrast .profile-detail-item,
+body.high-contrast .member-node-card,
+body.high-contrast .modal-box,
+body.high-contrast .stat-card-custom,
+body.high-contrast .upload-panel-custom,
+body.high-contrast .activity-panel-custom,
+body.high-contrast .results-panel,
+body.high-contrast .result-card-item {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+}
+
+body.high-contrast .stat-icon,
+body.high-contrast .activity-icon {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #ffffff !important;
+}
+
+body.high-contrast .status-badge {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 1px solid #ffff00 !important;
+}
+
+body.high-contrast .form-input {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+}
+
+body.high-contrast .form-input:focus {
+  border-color: #ffff00 !important;
+  outline: 2px solid #ffff00 !important;
+}
+
+body.high-contrast .access-trigger {
+  background-color: #ffff00 !important;
+  color: #000000 !important;
+  border: 2px solid #000000 !important;
+}
+
+body.high-contrast .access-menu {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+}
+
+body.high-contrast .access-btn {
+  color: #ffffff !important;
+}
+
+body.high-contrast .access-toggle-btn {
+  background-color: #ffff00 !important;
+  color: #000000 !important;
+}
+
+body.high-contrast svg {
+  stroke: #ffffff !important;
+}
+
+body.high-contrast .svg-connection-line {
+  stroke: #ffffff !important;
+  stroke-width: 3px !important;
+}
+
+body.high-contrast input[type="checkbox"] {
+  outline: 2px solid #ffffff !important;
+}
+
+body.high-contrast select {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+}
+
+/* MAGNIFIER TOOL CLASSES */
+body.magnifier-enabled main {
+  z-index: 9999;
+  position: relative;
+}
+
+body.magnifier-enabled .accessibility-widget {
+  z-index: 20000 !important;
+}
+
+body.magnifier-enabled {
+  cursor: zoom-in;
+}
+
+body.magnifier-enabled .magnify-active {
+  transform: scale(1.3) !important;
+  z-index: 9999 !important;
+  position: relative !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  background-color: var(--white) !important;
+  border-radius: 8px !important;
+}
+
+/* Ensure high contrast magnifier background stays dark if high contrast is active */
+body.high-contrast.magnifier-enabled .magnify-active {
+  background-color: #000000 !important;
+  box-shadow: 0 0 15px rgba(255,255,255,0.3) !important;
+}

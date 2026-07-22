@@ -75,7 +75,8 @@ const summarizeMedicalRecord = async (req, res) => {
         }
 
         record.summaryStatus = "processing";
-        record.summaryError = "";
+        record.summaryError = null;
+        await record.save();
 
         await record.save();
 
