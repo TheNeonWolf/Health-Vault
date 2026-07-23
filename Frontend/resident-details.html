@@ -373,15 +373,16 @@
                             </button>
                         </div>
 
-                        <div class="resident-placeholder-state">
-                            <span aria-hidden="true">💊</span>
-
-                            <h3>Medication section ready</h3>
-
-                            <p>
-                                We will connect medication add, edit,
-                                and delete functionality next.
-                            </p>
+                        <div
+                            id="medicationsList"
+                            class="medications-list"
+                            aria-live="polite"
+                        >
+                            <div class="resident-placeholder-state">
+                                <span aria-hidden="true">💊</span>
+                            
+                                <h3>Loading medications...</h3>
+                            </div>
                         </div>
                     </section>
 
@@ -955,6 +956,247 @@
                         id="saveRecordBtn"
                     >
                         Upload record
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Medication Modal -->
+    <div
+        class="modal-backdrop"
+        id="medicationModal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="medicationModalTitle"
+    >
+        <div class="modal-box resident-details-modal">
+            <button
+                type="button"
+                class="modal-close"
+                id="closeMedicationModalBtn"
+                aria-label="Close medication form"
+            >
+                ✕
+            </button>
+
+            <div class="modal-header">
+                <p class="resident-panel-eyebrow">
+                    Medication management
+                </p>
+
+                <h3 id="medicationModalTitle">
+                    Add medication
+                </h3>
+            </div>
+
+            <div
+                id="medicationFormMessage"
+                class="alert"
+                role="alert"
+                aria-live="polite"
+                hidden
+            ></div>
+
+            <form id="medicationForm" novalidate>
+                <input
+                    type="hidden"
+                    id="medicationId"
+                >
+
+                <div class="resident-modal-grid">
+                    <div class="resident-modal-field resident-modal-full">
+                        <label for="medicationName">
+                            Medication name *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="medicationName"
+                            class="form-input"
+                            placeholder="Example: Metformin"
+                            required
+                        >
+                    </div>
+
+                    <div class="resident-modal-field">
+                        <label for="medicationDosage">
+                            Dosage *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="medicationDosage"
+                            class="form-input"
+                            placeholder="Example: 500 mg"
+                            required
+                        >
+                    </div>
+                
+                    <div class="resident-modal-field">
+                        <label for="medicationFrequency">
+                            Frequency *
+                        </label>
+
+                        <select
+                            id="medicationFrequency"
+                            class="form-input"
+                            required
+                        >
+                            <option value="">
+                                Select frequency
+                            </option>
+                        
+                            <option value="Once Daily">
+                                Once Daily
+                            </option>
+                        
+                            <option value="Twice Daily">
+                                Twice Daily
+                            </option>
+                        
+                            <option value="Three Times Daily">
+                                Three Times Daily
+                            </option>
+                        
+                            <option value="Four Times Daily">
+                                Four Times Daily
+                            </option>
+                        
+                            <option value="As Needed">
+                                As Needed
+                            </option>
+                        
+                            <option value="Weekly">
+                                Weekly
+                            </option>
+                        
+                            <option value="Other">
+                                Other
+                            </option>
+                        </select>
+                    </div>
+                
+                    <div class="resident-modal-field">
+                        <label for="medicationStartDate">
+                            Start date *
+                        </label>
+                    
+                        <input
+                            type="date"
+                            id="medicationStartDate"
+                            class="form-input"
+                            required
+                        >
+                    </div>
+
+                    <div class="resident-modal-field">
+                        <label for="medicationEndDate">
+                            End date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="medicationEndDate"
+                            class="form-input"
+                        >
+                    </div>
+
+                    <div class="resident-modal-field">
+                        <label for="medicationStatus">
+                            Status
+                        </label>
+                    
+                        <select
+                            id="medicationStatus"
+                            class="form-input"
+                        >
+                            <option value="Active">
+                                Active
+                            </option>
+                        
+                            <option value="Paused">
+                                Paused
+                            </option>
+                        
+                            <option value="Completed">
+                                Completed
+                            </option>
+                        </select>
+                    </div>
+                
+                    <div class="resident-modal-field">
+                        <label for="medicationPrescribedBy">
+                            Prescribed by
+                        </label>
+                    
+                        <input
+                            type="text"
+                            id="medicationPrescribedBy"
+                            class="form-input"
+                            placeholder="Doctor or clinic"
+                        >
+                    </div>
+                
+                    <div class="resident-modal-field resident-modal-full">
+                        <label for="medicationTimes">
+                            Medication times
+                        </label>
+
+                        <input
+                            type="text"
+                            id="medicationTimes"
+                            class="form-input"
+                            placeholder="Example: 08:00, 20:00"
+                        >
+                    
+                        <small class="medication-field-hint">
+                            Separate multiple times with commas.
+                        </small>
+                    </div>
+                
+                    <div class="resident-modal-field resident-modal-full">
+                        <label for="medicationInstructions">
+                            Instructions
+                        </label>
+                    
+                        <textarea
+                            id="medicationInstructions"
+                            class="form-input"
+                            rows="3"
+                            placeholder="Example: Take after food"
+                        ></textarea>
+                    </div>
+                
+                    <div class="resident-modal-field resident-modal-full">
+                        <label for="medicationNotes">
+                            Notes
+                        </label>
+
+                        <textarea
+                            id="medicationNotes"
+                            class="form-input"
+                            rows="3"
+                            placeholder="Additional medication notes"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <div class="resident-modal-actions">
+                    <button
+                        type="button"
+                        class="btn btn-outline"
+                        id="cancelMedicationBtn"
+                    >
+                        Cancel
+                    </button>
+                
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                        id="saveMedicationBtn"
+                    >
+                        Save medication
                     </button>
                 </div>
             </form>

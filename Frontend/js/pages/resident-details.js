@@ -1,6 +1,7 @@
 let currentResident = null;
 let residentId = null;
 let medicalRecords = [];
+let medications = [];
 let summarizingRecordIds = new Set();
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -29,8 +30,67 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     await loadResident();
-    await loadMedicalRecords();
+    await Promise.all([
+        loadMedicalRecords(),
+        loadMedications(),
+    ]);
 });
+
+const openAddMedicationModal = () => {
+    document
+        .getElementById("medicationForm")
+        ?.reset();
+
+    setValue("medicationId", "");
+    setValue("medicationStatus", "Active");
+
+    clearMessage(
+        document.getElementById(
+            "medicationFormMessage"
+        )
+    );
+
+    const title =
+        document.getElementById(
+            "medicationModalTitle"
+        );
+
+    const saveButton =
+        document.getElementById(
+            "saveMedicationBtn"
+        );
+
+    if (title) {
+        title.textContent = "Add medication";
+    }
+
+    if (saveButton) {
+        saveButton.textContent =
+            "Save medication";
+    }
+
+    openModal("medicationModal");
+
+    document
+        .getElementById("medicationName")
+        ?.focus();
+};
+
+const closeMedicationModal = () => {
+    closeModal("medicationModal");
+
+    document
+        .getElementById("medicationForm")
+        ?.reset();
+
+    clearMessage(
+        document.getElementById(
+            "medicationFormMessage"
+        )
+    );
+
+    setValue("medicationId", "");
+};
 
 const displaySidebarUser = (user) => {
     const name =
@@ -123,6 +183,39 @@ const setupResidentDetailEvents = () => {
             "submit",
             saveEmergencyProfile
         );
+
+    document
+        .getElementById("addMedicationBtn")
+        ?.addEventListener(
+            "click",
+            openAddMedicationModal
+        );
+
+    document
+        .getElementById("closeMedicationModalBtn")
+        ?.addEventListener(
+            "click",
+            closeMedicationModal
+        );
+
+    document
+        .getElementById("cancelMedicationBtn")
+        ?.addEventListener(
+            "click",
+            closeMedicationModal
+        );
+
+    document
+        .getElementById("medicationForm")
+        ?.addEventListener(
+            "submit",
+            handleMedicationSubmit
+        );
+
+    setupOutsideModalClose(
+        "medicationModal",
+        closeMedicationModal
+    );
 
     setupOutsideModalClose(
         "editResidentModal",
@@ -1639,4 +1732,599 @@ const deleteMedicalRecord = async (
                 "Unable to delete the medical record."
         );
     }
+};
+
+const loadMedications = async () => {
+    const listElement =
+        document.getElementById(
+            "medicationsList"
+        );
+
+    if (!listElement || !residentId) {
+        return;
+    }
+
+    try {
+        listElement.innerHTML = `
+            <div class="resident-placeholder-state">
+                <span aria-hidden="true">💊</span>
+                <h3>Loading medications...</h3>
+            </div>
+        `;
+
+        const response = await apiRequest(
+            `/medications/resident/${encodeURIComponent(
+                residentId
+            )}`
+        );
+
+        medications =
+            response?.medications ||
+            response?.data ||
+            response ||
+            [];
+
+        if (!Array.isArray(medications)) {
+            medications = [];
+        }
+
+        renderMedications();
+    } catch (error) {
+        console.error(
+            "Medication loading error:",
+            error
+        );
+
+        listElement.innerHTML = `
+            <div class="resident-placeholder-state">
+                <span aria-hidden="true">⚠️</span>
+
+                <h3>Unable to load medications</h3>
+
+                <p>
+                    ${escapeHtml(
+                        error.message ||
+                            "Please try again."
+                    )}
+                </p>
+            </div>
+        `;
+    }
+};
+
+const renderMedications = () => {
+    const listElement =
+        document.getElementById(
+            "medicationsList"
+        );
+
+    if (!listElement) {
+        return;
+    }
+
+    if (medications.length === 0) {
+        listElement.innerHTML = `
+            <div class="resident-placeholder-state">
+                <span aria-hidden="true">💊</span>
+
+                <h3>No medications recorded</h3>
+
+                <p>
+                    Add the first medication for this resident.
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+    listElement.innerHTML =
+        medications
+            .map(createMedicationCard)
+            .join("");
+
+    listElement
+        .querySelectorAll(
+            "[data-edit-medication]"
+        )
+        .forEach((button) => {
+            button.addEventListener(
+                "click",
+                () => {
+                    openEditMedicationModal(
+                        button.dataset
+                            .editMedication
+                    );
+                }
+            );
+        });
+
+    listElement
+        .querySelectorAll(
+            "[data-delete-medication]"
+        )
+        .forEach((button) => {
+            button.addEventListener(
+                "click",
+                () => {
+                    deleteMedication(
+                        button.dataset
+                            .deleteMedication
+                    );
+                }
+            );
+        });
+};
+
+const createMedicationCard = (
+    medication
+) => {
+    const id =
+        medication._id ||
+        medication.id ||
+        "";
+
+    const name =
+        medication.name ||
+        "Unnamed medication";
+
+    const dosage =
+        medication.dosage ||
+        "Dosage not recorded";
+
+    const frequency =
+        medication.frequency ||
+        "Frequency not recorded";
+
+    const status =
+        medication.status ||
+        "Active";
+
+    const times =
+        Array.isArray(medication.times)
+            ? medication.times
+            : [];
+
+    const startDate =
+        medication.startDate
+            ? formatDate(
+                  medication.startDate
+              )
+            : "Not recorded";
+
+    const endDate =
+        medication.endDate
+            ? formatDate(
+                  medication.endDate
+              )
+            : "Ongoing";
+
+    const instructions =
+        medication.instructions ||
+        "No instructions recorded.";
+
+    const prescribedBy =
+        medication.prescribedBy ||
+        "Not recorded";
+
+    return `
+        <article class="medication-card">
+            <div class="medication-card-header">
+                <div class="medication-card-identity">
+                    <div
+                        class="medication-card-icon"
+                        aria-hidden="true"
+                    >
+                        💊
+                    </div>
+
+                    <div>
+                        <span
+                            class="medication-status medication-status-${escapeHtml(
+                                status.toLowerCase()
+                            )}"
+                        >
+                            ${escapeHtml(status)}
+                        </span>
+
+                        <h3>
+                            ${escapeHtml(name)}
+                        </h3>
+
+                        <p>
+                            ${escapeHtml(dosage)}
+                            ·
+                            ${escapeHtml(frequency)}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="medication-card-actions">
+                    <button
+                        type="button"
+                        class="medication-action-btn"
+                        data-edit-medication="${escapeHtml(
+                            id
+                        )}"
+                    >
+                        Edit
+                    </button>
+
+                    <button
+                        type="button"
+                        class="medication-action-btn delete"
+                        data-delete-medication="${escapeHtml(
+                            id
+                        )}"
+                    >
+                        Delete
+                    </button>
+                </div>
+            </div>
+
+            <div class="medication-details-grid">
+                <article>
+                    <span>Start date</span>
+                    <strong>
+                        ${escapeHtml(startDate)}
+                    </strong>
+                </article>
+
+                <article>
+                    <span>End date</span>
+                    <strong>
+                        ${escapeHtml(endDate)}
+                    </strong>
+                </article>
+
+                <article>
+                    <span>Prescribed by</span>
+                    <strong>
+                        ${escapeHtml(
+                            prescribedBy
+                        )}
+                    </strong>
+                </article>
+
+                <article>
+                    <span>Medication times</span>
+                    <strong>
+                        ${
+                            times.length
+                                ? times
+                                      .map(
+                                          escapeHtml
+                                      )
+                                      .join(", ")
+                                : "Not recorded"
+                        }
+                    </strong>
+                </article>
+            </div>
+
+            <div class="medication-instructions">
+                <span>Instructions</span>
+
+                <p>
+                    ${escapeHtml(
+                        instructions
+                    )}
+                </p>
+            </div>
+
+            ${
+                medication.notes
+                    ? `
+                        <div class="medication-notes">
+                            <span>Notes</span>
+
+                            <p>
+                                ${escapeHtml(
+                                    medication.notes
+                                )}
+                            </p>
+                        </div>
+                    `
+                    : ""
+            }
+        </article>
+    `;
+};
+
+const handleMedicationSubmit = async (
+    event
+) => {
+    event.preventDefault();
+
+    const messageElement =
+        document.getElementById(
+            "medicationFormMessage"
+        );
+
+    const saveButton =
+        document.getElementById(
+            "saveMedicationBtn"
+        );
+
+    clearMessage(messageElement);
+
+    const medicationId =
+        getValue("medicationId");
+
+    const name =
+        getValue("medicationName");
+
+    const dosage =
+        getValue("medicationDosage");
+
+    const frequency =
+        getValue(
+            "medicationFrequency"
+        );
+
+    const startDate =
+        getValue(
+            "medicationStartDate"
+        );
+
+    const endDate =
+        getValue(
+            "medicationEndDate"
+        );
+
+    if (
+        !name ||
+        !dosage ||
+        !frequency ||
+        !startDate
+    ) {
+        showMessage(
+            messageElement,
+            "Medication name, dosage, frequency, and start date are required."
+        );
+
+        return;
+    }
+
+    if (
+        endDate &&
+        new Date(endDate) <
+            new Date(startDate)
+    ) {
+        showMessage(
+            messageElement,
+            "End date cannot be before the start date."
+        );
+
+        return;
+    }
+
+    const times =
+        getValue("medicationTimes")
+            .split(",")
+            .map((time) => time.trim())
+            .filter(Boolean);
+
+    const body = {
+        resident: residentId,
+        name,
+        dosage,
+        frequency,
+        startDate,
+        endDate: endDate || null,
+        status:
+            getValue(
+                "medicationStatus"
+            ) || "Active",
+        prescribedBy:
+            getValue(
+                "medicationPrescribedBy"
+            ),
+        times,
+        instructions:
+            getValue(
+                "medicationInstructions"
+            ),
+        notes:
+            getValue(
+                "medicationNotes"
+            ),
+    };
+
+    const isEditing =
+        Boolean(medicationId);
+
+    try {
+        setButtonLoading(
+            saveButton,
+            true,
+            isEditing
+                ? "Saving..."
+                : "Adding..."
+        );
+
+        const response =
+            await apiRequest(
+                isEditing
+                    ? `/medications/${encodeURIComponent(
+                          medicationId
+                      )}`
+                    : "/medications",
+                {
+                    method:
+                        isEditing
+                            ? "PUT"
+                            : "POST",
+                    body,
+                }
+            );
+
+        const savedMedication =
+            response?.medication ||
+            response?.data ||
+            response;
+
+        if (isEditing) {
+            medications =
+                medications.map(
+                    (item) => {
+                        const id =
+                            item._id ||
+                            item.id;
+
+                        return String(id) ===
+                            String(
+                                medicationId
+                            )
+                            ? {
+                                  ...item,
+                                  ...body,
+                                  ...(savedMedication &&
+                                  typeof savedMedication ===
+                                      "object"
+                                      ? savedMedication
+                                      : {}),
+                              }
+                            : item;
+                    }
+                );
+        } else {
+            if (
+                savedMedication &&
+                typeof savedMedication ===
+                    "object"
+            ) {
+                medications.unshift(
+                    savedMedication
+                );
+            } else {
+                await loadMedications();
+            }
+        }
+
+        closeMedicationModal();
+        renderMedications();
+
+        showMessage(
+            document.getElementById(
+                "residentDetailsMessage"
+            ),
+            isEditing
+                ? "Medication updated successfully."
+                : "Medication added successfully.",
+            "success"
+        );
+    } catch (error) {
+        console.error(
+            "Medication save error:",
+            error
+        );
+
+        showMessage(
+            messageElement,
+            error.data?.message ||
+                error.message ||
+                "Unable to save medication."
+        );
+    } finally {
+        setButtonLoading(
+            saveButton,
+            false
+        );
+    }
+};
+
+const deleteMedication = async (
+    medicationId
+) => {
+    const medication =
+        medications.find(
+            (item) =>
+                String(
+                    item._id ||
+                        item.id
+                ) === String(medicationId)
+        );
+
+    const confirmed =
+        window.confirm(
+            `Delete "${
+                medication?.name ||
+                "this medication"
+            }"?`
+        );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+        await apiRequest(
+            `/medications/${encodeURIComponent(
+                medicationId
+            )}`,
+            {
+                method: "DELETE",
+            }
+        );
+
+        medications =
+            medications.filter(
+                (item) =>
+                    String(
+                        item._id ||
+                            item.id
+                    ) !==
+                    String(
+                        medicationId
+                    )
+            );
+
+        renderMedications();
+
+        showMessage(
+            document.getElementById(
+                "residentDetailsMessage"
+            ),
+            "Medication deleted successfully.",
+            "success"
+        );
+    } catch (error) {
+        console.error(
+            "Medication delete error:",
+            error
+        );
+
+        showMessage(
+            document.getElementById(
+                "residentDetailsMessage"
+            ),
+            error.data?.message ||
+                error.message ||
+                "Unable to delete medication."
+        );
+    }
+};
+
+const toDateInputValue = (
+    dateValue
+) => {
+    if (!dateValue) {
+        return "";
+    }
+
+    const date =
+        new Date(dateValue);
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+        return "";
+    }
+
+    return date
+        .toISOString()
+        .split("T")[0];
 };

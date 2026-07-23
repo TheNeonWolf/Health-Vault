@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="HealthVault staff profile"
+    >
+
+    <title>Profile | HealthVault</title>
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/profile.css">
+    <link rel="stylesheet" href="css/accessibility.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+    <aside>
+        <div class="brand">
+            <div class="brand-icon" aria-hidden="true">
+                ✚
+            </div>
+
+            <div class="brand-text">
+                <h1>HealthVault</h1>
+                <span>Resident Care</span>
+            </div>
+        </div>
+
+        <nav aria-label="Main navigation">
+            <a href="dashboard.html" class="nav-item">
+                <span aria-hidden="true">▦</span>
+                Dashboard
+            </a>
+
+            <a href="residents.html" class="nav-item">
+                <span aria-hidden="true">👥</span>
+                Residents
+            </a>
+
+            <a
+                href="profile.html"
+                class="nav-item active"
+                aria-current="page"
+            >
+                <span aria-hidden="true">●</span>
+                Profile
+            </a>
+        </nav>
+
+        <div class="user-panel">
+            <div
+                class="user-avatar"
+                id="sidebarUserInitials"
+                aria-hidden="true"
+            >
+                HV
+            </div>
+
+            <div class="user-info">
+                <span
+                    class="user-name"
+                    id="sidebarUserName"
+                >
+                    Loading...
+                </span>
+
+                <span class="user-plan">
+                    Care staff
+                </span>
+            </div>
+        </div>
+    </aside>
+
+    <main>
+        <header>
+            <div>
+                <p class="profile-header-label">
+                    Staff account
+                </p>
+
+                <h2>Profile</h2>
+            </div>
+
+            <div class="header-status">
+                <span class="status-badge">
+                    <span aria-hidden="true">●</span>
+                    Secure session
+                </span>
+
+                <button
+                    type="button"
+                    class="btn btn-outline"
+                    id="logoutBtn"
+                >
+                    Log out
+                </button>
+            </div>
+        </header>
+
+        <section class="content-body">
+            <div
+                id="profileMessage"
+                class="alert"
+                role="alert"
+                aria-live="polite"
+                hidden
+            ></div>
+
+            <section class="profile-page-grid">
+                <article class="profile-main-card">
+                    <div class="profile-card-header">
+                        <div
+                            class="profile-avatar-large"
+                            id="profileInitials"
+                            aria-hidden="true"
+                        >
+                            HV
+                        </div>
+
+                        <div>
+                            <p class="profile-eyebrow">
+                                Staff profile
+                            </p>
+
+                            <h1 id="profileName">
+                                Loading...
+                            </h1>
+
+                            <p
+                                class="profile-email"
+                                id="profileEmail"
+                            >
+                                Loading account details...
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="profile-details-grid">
+                        <article class="profile-detail-item">
+                            <span>Full name</span>
+
+                            <strong id="profileFullName">
+                                —
+                            </strong>
+                        </article>
+
+                        <article class="profile-detail-item">
+                            <span>Email address</span>
+
+                            <strong id="profileEmailDetail">
+                                —
+                            </strong>
+                        </article>
+
+                        <article class="profile-detail-item">
+                            <span>Email status</span>
+
+                            <strong id="profileVerificationStatus">
+                                —
+                            </strong>
+                        </article>
+
+                        <article class="profile-detail-item">
+                            <span>Member since</span>
+
+                            <strong id="profileMemberSince">
+                                —
+                            </strong>
+                        </article>
+                    </div>
+                </article>
+
+                <aside class="profile-sidebar">
+                    <section class="profile-side-card">
+                        <p class="profile-side-label">
+                            Account status
+                        </p>
+
+                        <div
+                            class="profile-status-pill"
+                            id="profileStatusPill"
+                        >
+                            Checking...
+                        </div>
+
+                        <p
+                            class="profile-side-description"
+                            id="profileStatusDescription"
+                        >
+                            Loading account status...
+                        </p>
+                    </section>
+
+                    <section class="profile-side-card">
+                        <p class="profile-side-label">
+                            Account actions
+                        </p>
+
+                        <div class="profile-action-list">
+                            <button
+                                type="button"
+                                id="profileLogoutBtn"
+                            >
+                                <span aria-hidden="true">↪</span>
+
+                                <span>
+                                    <strong>Log out</strong>
+                                    <small>
+                                        End the current session
+                                    </small>
+                                </span>
+                            </button>
+                        </div>
+                    </section>
+                </aside>
+            </section>
+        </section>
+    </main>
+
+    <div class="accessibility-widget">
+        <div
+            class="access-menu"
+            id="accessibilityMenu"
+            aria-label="Accessibility settings"
+        >
+            <p class="access-title">
+                Accessibility
+            </p>
+
+            <div class="access-row">
+                <label for="contrastToggleBtn">
+                    High contrast
+                </label>
+
+                <button
+                    type="button"
+                    class="access-toggle-btn"
+                    id="contrastToggleBtn"
+                    aria-pressed="false"
+                >
+                    Enable
+                </button>
+            </div>
+
+            <div class="access-row">
+                <span>Text size</span>
+
+                <div class="access-btn-group">
+                    <button
+                        type="button"
+                        class="access-btn"
+                        id="decreaseTextBtn"
+                        aria-label="Decrease text size"
+                    >
+                        A−
+                    </button>
+
+                    <output id="fontSizeOutput">
+                        100%
+                    </output>
+
+                    <button
+                        type="button"
+                        class="access-btn"
+                        id="increaseTextBtn"
+                        aria-label="Increase text size"
+                    >
+                        A+
+                    </button>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                class="btn btn-outline"
+                id="resetAccessibilityBtn"
+            >
+                Reset settings
+            </button>
+        </div>
+
+        <button
+            type="button"
+            class="access-trigger"
+            id="accessibilityTrigger"
+            aria-label="Open accessibility settings"
+            aria-expanded="false"
+        >
+            ♿
+        </button>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/accessibility.js"></script>
+    <script src="js/pages/profile.js"></script>
+</body>
+</html>
