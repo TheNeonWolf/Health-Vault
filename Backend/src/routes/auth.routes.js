@@ -6,7 +6,10 @@ import {
     logoutUser,
     verifyEmail,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    updateProfileName,
+    changePassword,
+    deleteAccount
 } from "../controllers/auth.controllers.js";
 
 const router = express.Router();
@@ -20,5 +23,20 @@ router.post("/reset-password/:token", resetPassword);
 router.get("/me", verifyJWT, (req, res) => {
     res.status(200).json(req.user);
 });
+router.put(
+    "/profile/name",
+    verifyJWT,
+    updateProfileName
+);
+router.put(
+    "/profile/password",
+    verifyJWT,
+    changePassword
+);
+router.delete(
+    "/profile",
+    verifyJWT,
+    deleteAccount
+);
 
 export default router;

@@ -294,3 +294,167 @@
         grid-template-columns: 1fr;
     }
 }
+
+.profile-modal-box {
+    width: min(
+        520px,
+        calc(100vw - 32px)
+    );
+
+    max-width: 520px;
+    padding: 30px;
+}
+
+.profile-form-field {
+    margin-top: 18px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.profile-form-field label {
+    color: var(--text-muted);
+
+    font-size: 0.72rem;
+    font-weight: 800;
+
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+.profile-modal-box .form-input {
+    width: 100%;
+    min-height: 46px;
+
+    padding: 12px 14px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+
+    background-color: #f8fafc;
+    color: var(--navy-dark);
+
+    font-family: inherit;
+    font-size: 0.9rem;
+
+    outline: none;
+}
+
+.profile-modal-box .form-input:focus {
+    border-color:
+        var(--coral-accent);
+
+    background-color:
+        var(--white);
+
+    box-shadow:
+        0 0 0 4px
+        rgba(201, 173, 167, 0.18);
+}
+
+.profile-modal-actions {
+    margin-top: 24px;
+    padding-top: 20px;
+
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+
+    border-top:
+        1px solid var(--border-light);
+}
+
+.profile-password-toggle {
+    margin-top: 16px;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: var(--navy-dark);
+
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.profile-danger-action {
+    border-color:
+        #fecaca !important;
+
+    background-color:
+        #fef2f2 !important;
+
+    color:
+        #991b1b !important;
+}
+
+.profile-danger-action:hover {
+    border-color:
+        #dc2626 !important;
+}
+
+.profile-delete-modal {
+    text-align: center;
+}
+
+.profile-delete-warning-icon {
+    width: 58px;
+    height: 58px;
+
+    margin: 0 auto 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background-color:
+        #fee2e2;
+
+    color:
+        #b91c1c;
+
+    font-size: 1.5rem;
+    font-weight: 900;
+}
+
+.profile-delete-description {
+    margin-top: 12px;
+
+    color: var(--text-muted);
+
+    font-size: 0.85rem;
+    line-height: 1.65;
+}
+
+.profile-delete-modal .profile-form-field {
+    text-align: left;
+}
+
+.profile-delete-confirm-btn {
+    border: none;
+
+    background-color:
+        #dc2626;
+
+    color:
+        var(--white);
+}
+
+.profile-delete-confirm-btn:hover {
+    background-color:
+        #b91c1c;
+}
+
+@media (max-width: 520px) {
+    .profile-modal-actions {
+        flex-direction:
+            column-reverse;
+    }
+
+    .profile-modal-actions .btn {
+        width: 100%;
+    }
+}

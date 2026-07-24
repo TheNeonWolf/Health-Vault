@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         loadMedicalRecords(),
         loadMedications(),
     ]);
+    renderResidentTimeline();
 });
 
 const openAddMedicationModal = () => {
@@ -265,6 +266,38 @@ const setupResidentDetailEvents = () => {
     setupOutsideModalClose( 
         "uploadRecordModal",
         closeUploadRecordModal
+    );
+
+    document
+        .getElementById(
+            "closeDeleteItemModalBtn"
+        )
+        ?.addEventListener(
+            "click",
+            closeDeleteItemModal
+        );
+
+    document
+        .getElementById(
+            "cancelDeleteItemBtn"
+        )
+        ?.addEventListener(
+            "click",
+            closeDeleteItemModal
+        );
+
+    document
+        .getElementById(
+            "confirmDeleteItemBtn"
+        )
+        ?.addEventListener(
+            "click",
+            confirmPendingDelete
+        );
+
+    setupOutsideModalClose(
+        "deleteItemModal",
+        closeDeleteItemModal
     );
 };
 
@@ -636,9 +669,13 @@ const saveResidentProfile = async (event) => {
             typeof updatedResident === "object"
                 ? updatedResident
                 : {}),
+            updatedAt:
+                updatedResident?.updatedAt ||
+                new Date().toISOString(),
         };
 
         renderResident();
+        renderResidentTimeline();
         closeEditResidentModal();
 
         showMessage(
@@ -766,9 +803,13 @@ const saveEmergencyProfile = async (event) => {
             typeof updatedResident === "object"
                 ? updatedResident
                 : {}),
+            updatedAt:
+                updatedResident?.updatedAt ||
+                new Date().toISOString(),
         };
 
         renderResident();
+        renderResidentTimeline();
         closeEmergencyModal();
 
         showMessage(
@@ -1040,6 +1081,7 @@ const loadMedicalRecords = async () => {
         }
 
         renderMedicalRecords();
+        renderResidentTimeline();
     } catch (error) {
         console.error(
             "Medical records loading error:",
@@ -1327,9 +1369,9 @@ const summarizeMedicalRecord = async (
         return;
     }
 
-    const ExistingSummary =
+    const existingSummary  =
         record.aiSummary ||
-        record.hasSummary;
+        record.summary;
     
     const hasExistingSummary =
         record.summaryStatus === "completed" &&
@@ -1351,6 +1393,7 @@ const summarizeMedicalRecord = async (
     );
 
     renderMedicalRecords();
+    renderResidentTimeline();
 
     try {
         const response =
@@ -1470,6 +1513,7 @@ const summarizeMedicalRecord = async (
         );
 
         renderMedicalRecords();
+        renderResidentTimeline();
     }
 };
 
@@ -1667,7 +1711,132 @@ const previewMedicalRecord = async (
     }
 };
 
-const deleteMedicalRecord = async (
+const openDeleteItemModal = ({
+    title,
+    description,
+    buttonText,
+    onConfirm,
+}) => {
+    const modal =
+        document.getElementById(
+            "deleteItemModal"
+        );
+
+    const titleElement =
+        document.getElementById(
+            "deleteItemModalTitle"
+        );
+
+    const descriptionElement =
+        document.getElementById(
+            "deleteItemModalDescription"
+        );
+
+    const confirmButton =
+        document.getElementById(
+            "confirmDeleteItemBtn"
+        );
+
+    clearMessage(
+        document.getElementById(
+            "deleteItemMessage"
+        )
+    );
+
+    if (titleElement) {
+        titleElement.textContent =
+            title;
+    }
+
+    if (descriptionElement) {
+        descriptionElement.textContent =
+            description;
+    }
+
+    if (confirmButton) {
+        confirmButton.textContent =
+            buttonText;
+    }
+
+    pendingDeleteAction =
+        typeof onConfirm === "function"
+            ? onConfirm
+            : null;
+
+    modal?.classList.add("active");
+
+    document.body.style.overflow =
+        "hidden";
+
+    confirmButton?.focus();
+};
+
+const closeDeleteItemModal = () => {
+    document
+        .getElementById(
+            "deleteItemModal"
+        )
+        ?.classList.remove("active");
+
+    document.body.style.overflow =
+        "";
+
+    pendingDeleteAction = null;
+
+    clearMessage(
+        document.getElementById(
+            "deleteItemMessage"
+        )
+    );
+};
+
+const confirmPendingDelete = async () => {
+        if (!pendingDeleteAction) {
+            return;
+        }
+
+        const confirmButton =
+            document.getElementById(
+                "confirmDeleteItemBtn"
+            );
+
+        const action =
+            pendingDeleteAction;
+
+        /*
+         * Clear it immediately to prevent accidental
+         * double execution.
+         */
+        pendingDeleteAction = null;
+
+        try {
+            setButtonLoading(
+                confirmButton,
+                true,
+                "Deleting..."
+            );
+
+            await action();
+
+            closeDeleteItemModal();
+        } catch (error) {
+            showMessage(
+                document.getElementById(
+                    "deleteItemMessage"
+                ),
+                error.data?.message ||
+                    error.message ||
+                    "Unable to delete the item."
+            );
+        } finally {
+            setButtonLoading(
+                confirmButton,
+                false
+            );
+        }
+};
+
+const deleteMedicalRecord = (
     recordId
 ) => {
     const record =
@@ -1679,59 +1848,52 @@ const deleteMedicalRecord = async (
                 ) === String(recordId)
         );
 
-    const confirmed = window.confirm(
-        `Delete "${
-            record?.title ||
-            "this medical record"
-        }"?`
-    );
+    const recordTitle =
+        record?.title ||
+        "this medical record";
 
-    if (!confirmed) {
-        return;
-    }
+    openDeleteItemModal({
+        title:
+            "Delete medical record?",
 
-    try {
-        await apiRequest(
-            `/records/${encodeURIComponent(
-                recordId
-            )}`,
-            {
-                method: "DELETE",
-            }
-        );
+        description:
+            `You are about to delete "${recordTitle}".`,
 
-        medicalRecords =
-            medicalRecords.filter(
-                (item) =>
-                    String(
-                        item._id ||
-                            item.id
-                    ) !== String(recordId)
+        buttonText:
+            "Delete record",
+
+        onConfirm: async () => {
+            await apiRequest(
+                `/records/${encodeURIComponent(
+                    recordId
+                )}`,
+                {
+                    method: "DELETE",
+                }
             );
 
-        renderMedicalRecords();
+            medicalRecords =
+                medicalRecords.filter(
+                    (item) =>
+                        String(
+                            item._id ||
+                                item.id
+                        ) !==
+                        String(recordId)
+                );
 
-        showMessage(
-            document.getElementById(
-                "residentDetailsMessage"
-            ),
-            "Medical record deleted successfully.",
-            "success"
-        );
-    } catch (error) {
-        console.error(
-            "Medical record delete error:",
-            error
-        );
+            renderMedicalRecords();
+            renderResidentTimeline();
 
-        showMessage(
-            document.getElementById(
-                "residentDetailsMessage"
-            ),
-            error.message ||
-                "Unable to delete the medical record."
-        );
-    }
+            showMessage(
+                document.getElementById(
+                    "residentDetailsMessage"
+                ),
+                "Medical record deleted successfully.",
+                "success"
+            );
+        },
+    });
 };
 
 const loadMedications = async () => {
@@ -1769,6 +1931,7 @@ const loadMedications = async () => {
         }
 
         renderMedications();
+        renderResidentTimeline();
     } catch (error) {
         console.error(
             "Medication loading error:",
@@ -2031,6 +2194,133 @@ const createMedicationCard = (
     `;
 };
 
+const openEditMedicationModal = (
+    medicationId
+) => {
+    const medication =
+        medications.find((item) => {
+            const id =
+                item._id ||
+                item.id;
+
+            return (
+                String(id) ===
+                String(medicationId)
+            );
+        });
+
+    if (!medication) {
+        showMessage(
+            document.getElementById(
+                "residentDetailsMessage"
+            ),
+            "Medication could not be found."
+        );
+
+        return;
+    }
+
+    clearMessage(
+        document.getElementById(
+            "medicationFormMessage"
+        )
+    );
+
+    setValue(
+        "medicationId",
+        medicationId
+    );
+
+    setValue(
+        "medicationName",
+        medication.name
+    );
+
+    setValue(
+        "medicationDosage",
+        medication.dosage
+    );
+
+    setValue(
+        "medicationFrequency",
+        medication.frequency
+    );
+
+    setValue(
+        "medicationStartDate",
+        toDateInputValue(
+            medication.startDate
+        )
+    );
+
+    setValue(
+        "medicationEndDate",
+        toDateInputValue(
+            medication.endDate
+        )
+    );
+
+    setValue(
+        "medicationStatus",
+        medication.status ||
+            "Active"
+    );
+
+    setValue(
+        "medicationPrescribedBy",
+        medication.prescribedBy
+    );
+
+    setValue(
+        "medicationTimes",
+        Array.isArray(
+            medication.times
+        )
+            ? medication.times.join(", ")
+            : ""
+    );
+
+    setValue(
+        "medicationInstructions",
+        medication.instructions
+    );
+
+    setValue(
+        "medicationNotes",
+        medication.notes
+    );
+
+    const title =
+        document.getElementById(
+            "medicationModalTitle"
+        );
+
+    const saveButton =
+        document.getElementById(
+            "saveMedicationBtn"
+        );
+
+    if (title) {
+        title.textContent =
+            "Edit medication";
+    }
+
+    if (saveButton) {
+        saveButton.textContent =
+            "Save changes";
+    }
+
+    openModal(
+        "medicationModal"
+    );
+
+    document
+        .getElementById(
+            "medicationName"
+        )
+        ?.focus();
+};
+
 const handleMedicationSubmit = async (
     event
 ) => {
@@ -2204,6 +2494,7 @@ const handleMedicationSubmit = async (
 
         closeMedicationModal();
         renderMedications();
+        renderMedications();
 
         showMessage(
             document.getElementById(
@@ -2234,7 +2525,7 @@ const handleMedicationSubmit = async (
     }
 };
 
-const deleteMedication = async (
+const deleteMedication = (
     medicationId
 ) => {
     const medication =
@@ -2243,67 +2534,58 @@ const deleteMedication = async (
                 String(
                     item._id ||
                         item.id
-                ) === String(medicationId)
+                ) ===
+                String(medicationId)
         );
 
-    const confirmed =
-        window.confirm(
-            `Delete "${
-                medication?.name ||
-                "this medication"
-            }"?`
-        );
+    const medicationName =
+        medication?.name ||
+        "this medication";
 
-    if (!confirmed) {
-        return;
-    }
+    openDeleteItemModal({
+        title:
+            "Delete medication?",
 
-    try {
-        await apiRequest(
-            `/medications/${encodeURIComponent(
-                medicationId
-            )}`,
-            {
-                method: "DELETE",
-            }
-        );
+        description:
+            `You are about to delete "${medicationName}".`,
 
-        medications =
-            medications.filter(
-                (item) =>
-                    String(
-                        item._id ||
-                            item.id
-                    ) !==
-                    String(
-                        medicationId
-                    )
+        buttonText:
+            "Delete medication",
+
+        onConfirm: async () => {
+            await apiRequest(
+                `/medications/${encodeURIComponent(
+                    medicationId
+                )}`,
+                {
+                    method: "DELETE",
+                }
             );
 
-        renderMedications();
+            medications =
+                medications.filter(
+                    (item) =>
+                        String(
+                            item._id ||
+                                item.id
+                        ) !==
+                        String(
+                            medicationId
+                        )
+                );
 
-        showMessage(
-            document.getElementById(
-                "residentDetailsMessage"
-            ),
-            "Medication deleted successfully.",
-            "success"
-        );
-    } catch (error) {
-        console.error(
-            "Medication delete error:",
-            error
-        );
+            renderMedications();
+            renderResidentTimeline();
 
-        showMessage(
-            document.getElementById(
-                "residentDetailsMessage"
-            ),
-            error.data?.message ||
-                error.message ||
-                "Unable to delete medication."
-        );
-    }
+            showMessage(
+                document.getElementById(
+                    "residentDetailsMessage"
+                ),
+                "Medication deleted successfully.",
+                "success"
+            );
+        },
+    });
 };
 
 const toDateInputValue = (
@@ -2327,4 +2609,363 @@ const toDateInputValue = (
     return date
         .toISOString()
         .split("T")[0];
+};
+
+const renderResidentTimeline = () => {
+    const timelineElement =
+        document.getElementById(
+            "residentTimeline"
+        );
+
+    if (!timelineElement) {
+        return;
+    }
+
+    const events =
+        createResidentTimelineEvents();
+
+    if (events.length === 0) {
+        timelineElement.innerHTML = `
+            <div class="resident-placeholder-state">
+                <span aria-hidden="true">🕒</span>
+
+                <h3>No activity recorded yet</h3>
+
+                <p>
+                    Resident updates, medications,
+                    medical records, and AI summaries
+                    will appear here.
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+    const groupedEvents =
+        groupTimelineEventsByDate(events);
+
+    timelineElement.innerHTML =
+        groupedEvents
+            .map(
+                ([dateLabel, dateEvents]) => `
+                    <section class="timeline-date-group">
+                        <h3 class="timeline-date-label">
+                            ${escapeHtml(dateLabel)}
+                        </h3>
+
+                        <div class="timeline-events">
+                            ${dateEvents
+                                .map(
+                                    createTimelineEventMarkup
+                                )
+                                .join("")}
+                        </div>
+                    </section>
+                `
+            )
+            .join("");
+};
+
+const createResidentTimelineEvents = () => {
+    const events = [];
+
+    if (currentResident?.createdAt) {
+        events.push({
+            type: "resident-created",
+            icon: "👤",
+            title:
+                "Resident profile created",
+            description:
+                currentResident.name ||
+                "Resident profile",
+            date: currentResident.createdAt,
+        });
+    }
+
+    if (
+        currentResident?.updatedAt &&
+        currentResident.updatedAt !==
+            currentResident.createdAt
+    ) {
+        events.push({
+            type: "resident-updated",
+            icon: "✎",
+            title:
+                "Resident profile updated",
+            description:
+                "General or emergency information was updated.",
+            date: currentResident.updatedAt,
+        });
+    }
+
+    medicalRecords.forEach((record) => {
+        const recordTitle =
+            record.title ||
+            "Medical record";
+
+        const uploadDate =
+            record.createdAt ||
+            record.recordDate;
+
+        if (uploadDate) {
+            events.push({
+                type: "record-uploaded",
+                icon: "📄",
+                title:
+                    "Medical record uploaded",
+                description:
+                    recordTitle,
+                meta:
+                    record.fileName ||
+                    record.category ||
+                    "",
+                date: uploadDate,
+            });
+        }
+
+        if (
+            record.summaryStatus ===
+                "completed" &&
+            record.summarizedAt
+        ) {
+            events.push({
+                type: "summary-generated",
+                icon: "✨",
+                title:
+                    "AI summary generated",
+                description:
+                    recordTitle,
+                meta:
+                    "Gemini medical-record summary",
+                date: record.summarizedAt,
+            });
+        }
+    });
+
+    medications.forEach(
+        (medication) => {
+            if (medication.createdAt) {
+                events.push({
+                    type: "medication-added",
+                    icon: "💊",
+                    title:
+                        "Medication added",
+                    description:
+                        medication.name ||
+                        "Medication",
+                    meta: [
+                        medication.dosage,
+                        medication.frequency,
+                    ]
+                        .filter(Boolean)
+                        .join(" · "),
+                    date:
+                        medication.createdAt,
+                });
+            }
+
+            if (
+                medication.updatedAt &&
+                medication.updatedAt !==
+                    medication.createdAt
+            ) {
+                events.push({
+                    type:
+                        "medication-updated",
+                    icon: "✎",
+                    title:
+                        "Medication updated",
+                    description:
+                        medication.name ||
+                        "Medication",
+                    meta:
+                        medication.status ||
+                        "",
+                    date:
+                        medication.updatedAt,
+                });
+            }
+        }
+    );
+
+    return events
+        .filter((event) =>
+            isValidTimelineDate(
+                event.date
+            )
+        )
+        .sort(
+            (firstEvent, secondEvent) =>
+                new Date(
+                    secondEvent.date
+                ) -
+                new Date(
+                    firstEvent.date
+                )
+        );
+};
+
+const groupTimelineEventsByDate = (
+    events
+) => {
+    const groups = new Map();
+
+    events.forEach((event) => {
+        const label =
+            getTimelineDateLabel(
+                event.date
+            );
+
+        if (!groups.has(label)) {
+            groups.set(label, []);
+        }
+
+        groups
+            .get(label)
+            .push(event);
+    });
+
+    return Array.from(
+        groups.entries()
+    );
+};
+
+const createTimelineEventMarkup = (
+    event
+) => {
+    return `
+        <article class="timeline-event">
+            <div
+                class="timeline-event-marker"
+                aria-hidden="true"
+            >
+                ${escapeHtml(event.icon)}
+            </div>
+
+            <div class="timeline-event-content">
+                <div class="timeline-event-header">
+                    <h4>
+                        ${escapeHtml(
+                            event.title
+                        )}
+                    </h4>
+
+                    <time
+                        datetime="${escapeHtml(
+                            new Date(
+                                event.date
+                            ).toISOString()
+                        )}"
+                    >
+                        ${escapeHtml(
+                            formatTimelineTime(
+                                event.date
+                            )
+                        )}
+                    </time>
+                </div>
+
+                <p class="timeline-event-description">
+                    ${escapeHtml(
+                        event.description ||
+                            ""
+                    )}
+                </p>
+
+                ${
+                    event.meta
+                        ? `
+                            <p class="timeline-event-meta">
+                                ${escapeHtml(
+                                    event.meta
+                                )}
+                            </p>
+                        `
+                        : ""
+                }
+            </div>
+        </article>
+    `;
+};
+
+const isValidTimelineDate = (
+    dateValue
+) => {
+    if (!dateValue) {
+        return false;
+    }
+
+    const date = new Date(dateValue);
+
+    return !Number.isNaN(
+        date.getTime()
+    );
+};
+
+const getTimelineDateLabel = (
+    dateValue
+) => {
+    const date = new Date(dateValue);
+    const today = new Date();
+    const yesterday = new Date();
+
+    yesterday.setDate(
+        today.getDate() - 1
+    );
+
+    if (
+        isSameCalendarDate(
+            date,
+            today
+        )
+    ) {
+        return "Today";
+    }
+
+    if (
+        isSameCalendarDate(
+            date,
+            yesterday
+        )
+    ) {
+        return "Yesterday";
+    }
+
+    return date.toLocaleDateString(
+        undefined,
+        {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+        }
+    );
+};
+
+const isSameCalendarDate = (
+    firstDate,
+    secondDate
+) => {
+    return (
+        firstDate.getFullYear() ===
+            secondDate.getFullYear() &&
+        firstDate.getMonth() ===
+            secondDate.getMonth() &&
+        firstDate.getDate() ===
+            secondDate.getDate()
+    );
+};
+
+const formatTimelineTime = (
+    dateValue
+) => {
+    const date = new Date(dateValue);
+
+    return date.toLocaleTimeString(
+        undefined,
+        {
+            hour: "numeric",
+            minute: "2-digit",
+        }
+    );
 };

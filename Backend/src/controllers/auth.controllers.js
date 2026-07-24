@@ -3,6 +3,10 @@ import bcrypt from 'bcryptjs';
 import generateToken from '../utils/generateToken.js';
 import crypto from "crypto";
 import sendEmail from '../utils/sendEmail.js';
+import fs from "fs";
+import Resident from "../models/Resident.js";
+import Medication from "../models/Medication.js";
+import MedicalRecords from "../models/MedicalRecords.js";
 
 const registerUser = async (req, res) => {
     try {
@@ -318,11 +322,243 @@ const resetPassword = async (req, res) => {
     }
 };
 
+const updateProfileName = async (req, res) => {
+    try {
+        const name = req.body.name?.trim();
+
+        if (!name) {
+            return res.status(400).json({
+                message: "Name is required",
+            });
+        }
+
+        if (name.length < 2) {
+            return res.status(400).json({
+                message: "Name must be at least 2 characters long",
+            });
+        }
+
+        if (name.length > 100) {
+            return res.status(400).json({
+                message: "Name must not exceed 100 characters",
+            });
+        }
+
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        user.name = name;
+
+        await user.save();
+
+        return res.status(200).json({
+            message: "Profile name updated successfully",
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                isVerified: user.isVerified,
+                createdAt: user.createdAt,
+            },
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
+const changePassword = async (req, res) => {
+    try {
+        const {
+            currentPassword,
+            newPassword,
+        } = req.body;
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({
+                message:
+                    "Current password and new password are required",
+            });
+        }
+
+        if (newPassword.length < 8) {
+            return res.status(400).json({
+                message:
+                    "New password must be at least 8 characters long",
+            });
+        }
+
+        const user = await User.findById(
+            req.user._id
+        ).select("+password");
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        const currentPasswordMatches =
+            await bcrypt.compare(
+                currentPassword,
+                user.password
+            );
+
+        if (!currentPasswordMatches) {
+            return res.status(400).json({
+                message: "Current password is incorrect",
+            });
+        }
+
+        const sameAsCurrentPassword =
+            await bcrypt.compare(
+                newPassword,
+                user.password
+            );
+
+        if (sameAsCurrentPassword) {
+            return res.status(400).json({
+                message:
+                    "New password must be different from the current password",
+            });
+        }
+
+        const hashedPassword =
+            await bcrypt.hash(
+                newPassword,
+                10
+            );
+
+        user.password = hashedPassword;
+
+        /*
+         * Invalidate any active password-reset link.
+         */
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        await user.save();
+
+        return res.status(200).json({
+            message: "Password changed successfully",
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
+const deleteAccount = async (req, res) => {
+    try {
+        const { password } = req.body;
+
+        if (!password) {
+            return res.status(400).json({
+                message:
+                    "Password is required to delete your account",
+            });
+        }
+
+        const user = await User.findById(
+            req.user._id
+        ).select("+password");
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        const passwordMatches =
+            await bcrypt.compare(
+                password,
+                user.password
+            );
+
+        if (!passwordMatches) {
+            return res.status(400).json({
+                message: "Incorrect password",
+            });
+        }
+
+        /*
+         * Read the medical records first so their uploaded
+         * files can be removed from the uploads directory.
+         */
+        const records =
+            await MedicalRecords.find({
+                createdBy: user._id,
+            });
+
+        for (const record of records) {
+            if (
+                record.filePath &&
+                fs.existsSync(record.filePath)
+            ) {
+                try {
+                    fs.unlinkSync(record.filePath);
+                } catch (fileError) {
+                    console.error(
+                        "Unable to delete uploaded file:",
+                        record.filePath,
+                        fileError
+                    );
+                }
+            }
+        }
+
+        /*
+         * Delete dependent account data.
+         */
+        await MedicalRecords.deleteMany({
+            createdBy: user._id,
+        });
+
+        await Medication.deleteMany({
+            createdBy: user._id,
+        });
+
+        await Resident.deleteMany({
+            createdBy: user._id,
+        });
+
+        await User.findByIdAndDelete(
+            user._id
+        );
+
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure:
+                process.env.NODE_ENV ===
+                "production",
+            sameSite: "lax",
+        });
+
+        return res.status(200).json({
+            message: "Account deleted successfully",
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
 export {
     registerUser,
     verifyEmail,
     loginUser,
     logoutUser,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    updateProfileName,
+    changePassword,
+    deleteAccount
 };

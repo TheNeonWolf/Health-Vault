@@ -207,16 +207,62 @@
                         <div class="profile-action-list">
                             <button
                                 type="button"
-                                id="profileLogoutBtn"
+                                id="openEditNameBtn"
+                                class="profile-action-btn"
                             >
-                                <span aria-hidden="true">↪</span>
+                                <span class="profile-action-icon" aria-hidden="true">✎</span>
 
-                                <span>
+                                <span class="profile-action-content">
+                                    <strong>Edit name</strong>
+                                    <small>
+                                        Update your display name
+                                    </small>
+                                </span>
+                            </button>
+
+                            <button
+                                type="button"
+                                id="openChangePasswordBtn"
+                                class="profile-action-btn"
+                            >
+                                <span class="profile-action-icon" aria-hidden="true">🔒</span>
+
+                                <span class="profile-action-content">
+                                    <strong>Change password</strong>
+                                    <small>
+                                        Update your account password
+                                    </small>
+                                </span>
+                            </button>
+
+                            <button
+                                type="button"
+                                id="profileLogoutBtn"
+                                class="profile-action-btn"
+                            >
+                                <span class="profile-action-icon" aria-hidden="true">↪</span>
+
+                                <span class="profile-action-content">
                                     <strong>Log out</strong>
                                     <small>
                                         End the current session
                                     </small>
                                 </span>
+                            </button>
+
+                            <button
+                                type="button"
+                                id="openDeleteAccountBtn"
+                                class="profile-action-btn profile-danger-action"
+                            >
+                                <span class="profile-action-icon" aria-hidden="true">!</span>
+
+                                <span class="profile-action-content">
+                                    <strong>Delete account</strong>
+                                    <small>
+                                        Permanently remove your data
+                                    </small>
+        </span>
                             </button>
                         </div>
                     </section>
@@ -224,6 +270,264 @@
             </section>
         </section>
     </main>
+
+    <div
+        class="modal-backdrop"
+        id="editNameModal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="editNameModalTitle"
+    >
+        <div class="modal-box profile-modal-box">
+            <button
+                type="button"
+                class="modal-close"
+                id="closeEditNameModalBtn"
+                aria-label="Close edit name form"
+            >
+                ✕
+            </button>
+
+            <div class="modal-header">
+                <p class="profile-eyebrow">
+                    Staff account
+                </p>
+
+                <h3 id="editNameModalTitle">
+                    Edit name
+                </h3>
+            </div>
+
+            <div
+                id="editNameMessage"
+                class="alert"
+                role="alert"
+                aria-live="polite"
+                hidden
+            ></div>
+
+            <form id="editNameForm" novalidate>
+                <div class="profile-form-field">
+                    <label for="editProfileName">
+                        Full name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="editProfileName"
+                        class="form-input"
+                        minlength="2"
+                        required
+                    >
+                </div>
+
+                <div class="profile-modal-actions">
+                    <button
+                        type="button"
+                        class="btn btn-outline"
+                        id="cancelEditNameBtn"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                        id="saveNameBtn"
+                    >
+                        Save changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div
+        class="modal-backdrop"
+        id="changePasswordModal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="changePasswordModalTitle"
+    >
+        <div class="modal-box profile-modal-box">
+            <button
+                type="button"
+                class="modal-close"
+                id="closeChangePasswordModalBtn"
+                aria-label="Close password form"
+            >
+                ✕
+            </button>
+
+            <div class="modal-header">
+                <p class="profile-eyebrow">
+                    Account security
+                </p>
+
+                <h3 id="changePasswordModalTitle">
+                    Change password
+                </h3>
+            </div>
+
+            <div
+                id="changePasswordMessage"
+                class="alert"
+                role="alert"
+                aria-live="polite"
+                hidden
+            ></div>
+
+            <form
+                id="changePasswordForm"
+                novalidate
+            >
+                <div class="profile-form-field">
+                    <label for="currentPassword">
+                        Current password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="currentPassword"
+                        class="form-input"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <div class="profile-form-field">
+                    <label for="newPassword">
+                        New password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="newPassword"
+                        class="form-input"
+                        autocomplete="new-password"
+                        minlength="8"
+                        required
+                    >
+                </div>
+
+                <div class="profile-form-field">
+                    <label for="confirmNewPassword">
+                        Confirm new password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="confirmNewPassword"
+                        class="form-input"
+                        autocomplete="new-password"
+                        minlength="8"
+                        required
+                    >
+                </div>
+
+                <label class="profile-password-toggle">
+                    <input
+                        type="checkbox"
+                        id="showProfilePasswords"
+                    >
+
+                    Show passwords
+                </label>
+
+                <div class="profile-modal-actions">
+                    <button
+                        type="button"
+                        class="btn btn-outline"
+                        id="cancelChangePasswordBtn"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                        id="savePasswordBtn"
+                    >
+                        Change password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div
+        class="modal-backdrop"
+        id="deleteAccountModal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="deleteAccountModalTitle"
+    >
+        <div class="modal-box profile-modal-box profile-delete-modal">
+            <div
+                class="profile-delete-warning-icon"
+                aria-hidden="true"
+            >
+                !
+            </div>
+
+            <div class="modal-header">
+                <h3 id="deleteAccountModalTitle">
+                    Delete your account?
+                </h3>
+            </div>
+
+            <p class="profile-delete-description">
+                This permanently deletes your account,
+                residents, medications, medical records,
+                uploaded files, and AI summaries.
+            </p>
+
+            <div
+                id="deleteAccountMessage"
+                class="alert"
+                role="alert"
+                aria-live="polite"
+                hidden
+            ></div>
+
+            <form
+                id="deleteAccountForm"
+                novalidate
+            >
+                <div class="profile-form-field">
+                    <label for="deleteAccountPassword">
+                        Enter your password to confirm
+                    </label>
+                
+                    <input
+                        type="password"
+                        id="deleteAccountPassword"
+                        class="form-input"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+            
+                <div class="profile-modal-actions">
+                    <button
+                        type="button"
+                        class="btn btn-outline"
+                        id="cancelDeleteAccountBtn"
+                    >
+                        Cancel
+                    </button>
+                
+                    <button
+                        type="submit"
+                        class="btn profile-delete-confirm-btn"
+                        id="confirmDeleteAccountBtn"
+                    >
+                        Delete account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div class="accessibility-widget">
         <div

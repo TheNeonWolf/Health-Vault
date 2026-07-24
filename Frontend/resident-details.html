@@ -182,6 +182,10 @@
                     Emergency profile
                 </a>
 
+                <a href="#timelineSection">
+                    Timeline
+                </a>
+
                 <a href="#medicationSection">
                     Medications
                 </a>
@@ -351,6 +355,34 @@
                         </div>
                     </section>
 
+                    <!-- Resident Activity Timeline -->
+                    <section
+                        class="resident-detail-panel"
+                        id="timelineSection"
+                    >
+                        <div class="resident-panel-header">
+                            <div>
+                                <p class="resident-panel-eyebrow">
+                                    Recent activity
+                                </p>
+                            
+                                <h2>Resident timeline</h2>
+                            </div>
+                        </div>
+
+                        <div
+                            id="residentTimeline"
+                            class="resident-timeline"
+                            aria-live="polite"
+                        >
+                            <div class="resident-placeholder-state">
+                                <span aria-hidden="true">🕒</span>
+                            
+                                <h3>Loading activity...</h3>
+                            </div>
+                        </div>
+                    </section>
+
                     <section
                         class="resident-detail-panel"
                         id="medicationSection"
@@ -453,42 +485,54 @@
                             <button
                                 type="button"
                                 id="quickEditResidentBtn"
+                                class="resident-quick-action-btn"
                             >
-                                <span aria-hidden="true">✎</span>
-
-                                <span>
+                                <span
+                                    class="resident-quick-action-icon"
+                                    aria-hidden="true"
+                                >
+                                    ✎
+                                </span>
+                            
+                                <span class="resident-quick-action-content">
                                     <strong>Edit profile</strong>
-                                    <small>
-                                        Update general details
-                                    </small>
+                                    <small>Update general details</small>
                                 </span>
                             </button>
 
                             <button
                                 type="button"
                                 id="quickEditEmergencyBtn"
+                                class="resident-quick-action-btn"
                             >
-                                <span aria-hidden="true">⚕</span>
+                                <span
+                                    class="resident-quick-action-icon"
+                                    aria-hidden="true"
+                                >
+                                    ⚕
+                                </span>
 
-                                <span>
+                                <span class="resident-quick-action-content">
                                     <strong>Emergency profile</strong>
-                                    <small>
-                                        Update critical information
-                                    </small>
+                                    <small>Update critical information</small>
                                 </span>
                             </button>
 
                             <button
                                 type="button"
                                 id="quickUploadRecordBtn"
+                                class="resident-quick-action-btn"
                             >
-                                <span aria-hidden="true">📄</span>
+                                <span
+                                    class="resident-quick-action-icon"
+                                    aria-hidden="true"
+                                >
+                                    📄
+                                </span>
 
-                                <span>
+                                <span class="resident-quick-action-content">
                                     <strong>Upload record</strong>
-                                    <small>
-                                        Add a medical document
-                                    </small>
+                                    <small>Add a medical document</small>
                                 </span>
                             </button>
                         </div>
@@ -1274,6 +1318,72 @@
         >
             ♿
         </button>
+
+        <div
+            class="modal-backdrop"
+            id="deleteItemModal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="deleteItemModalTitle"
+        >
+            <div class="modal-box delete-item-modal-box">
+                <button
+                    type="button"
+                    class="modal-close"
+                    id="closeDeleteItemModalBtn"
+                    aria-label="Close delete confirmation"
+                >
+                    ✕
+                </button>
+            
+                <div
+                    class="delete-item-warning-icon"
+                    aria-hidden="true"
+                >
+                    !
+                </div>
+            
+                <div class="delete-item-modal-content">
+                    <h3 id="deleteItemModalTitle">
+                        Delete item?
+                    </h3>
+                
+                    <p id="deleteItemModalDescription">
+                        Are you sure you want to delete this item?
+                    </p>
+                
+                    <strong class="delete-item-warning-text">
+                        This action cannot be undone.
+                    </strong>
+                </div>
+            
+                <div
+                    id="deleteItemMessage"
+                    class="alert"
+                    role="alert"
+                    aria-live="polite"
+                    hidden
+                ></div>
+
+                <div class="delete-item-modal-actions">
+                    <button
+                        type="button"
+                        class="btn btn-outline"
+                        id="cancelDeleteItemBtn"
+                    >
+                        Cancel
+                    </button>
+                
+                    <button
+                        type="button"
+                        class="btn delete-item-confirm-btn"
+                        id="confirmDeleteItemBtn"
+                    >
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="js/config.js"></script>

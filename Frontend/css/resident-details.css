@@ -1092,3 +1092,247 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* =========================================
+   RESIDENT TIMELINE
+========================================= */
+
+.resident-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.timeline-date-group {
+    position: relative;
+}
+
+.timeline-date-label {
+    margin-bottom: 14px;
+
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.timeline-events {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    padding-left: 24px;
+}
+
+.timeline-events::before {
+    content: "";
+
+    position: absolute;
+    top: 12px;
+    bottom: 12px;
+    left: 9px;
+
+    width: 2px;
+
+    background-color: var(--border-light);
+}
+
+.timeline-event {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 14px;
+}
+
+.timeline-event-marker {
+    position: relative;
+    z-index: 1;
+
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--border-light);
+    border-radius: 13px;
+
+    background-color: var(--beige-light);
+
+    font-size: 1.05rem;
+}
+
+.timeline-event-content {
+    padding: 16px;
+
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+
+    background-color: #f8fafc;
+}
+
+.timeline-event-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.timeline-event-header h4 {
+    color: var(--navy-dark);
+    font-size: 0.86rem;
+    font-weight: 800;
+}
+
+.timeline-event-header time {
+    flex-shrink: 0;
+
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+.timeline-event-description {
+    margin-top: 5px;
+
+    color: var(--navy-dark);
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.timeline-event-meta {
+    margin-top: 4px;
+
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 620px) {
+    .timeline-events {
+        padding-left: 0;
+    }
+
+    .timeline-events::before {
+        display: none;
+    }
+
+    .timeline-event {
+        grid-template-columns: 38px minmax(0, 1fr);
+        gap: 10px;
+    }
+
+    .timeline-event-marker {
+        width: 38px;
+        height: 38px;
+    }
+
+    .timeline-event-header {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+
+/* =========================================
+   DELETE ITEM CONFIRMATION MODAL
+========================================= */
+
+.delete-item-modal-box {
+    width: min(
+        520px,
+        calc(100vw - 32px)
+    );
+
+    padding: 32px;
+
+    text-align: center;
+}
+
+.delete-item-warning-icon {
+    width: 72px;
+    height: 72px;
+
+    margin: 0 auto 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background-color: #fee2e2;
+    color: #b91c1c;
+
+    font-size: 2rem;
+    font-weight: 900;
+}
+
+.delete-item-modal-content h3 {
+    color: var(--navy-dark);
+
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+.delete-item-modal-content p {
+    margin-top: 18px;
+
+    color: var(--navy-dark);
+
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.delete-item-warning-text {
+    display: block;
+
+    margin-top: 8px;
+
+    color: #c62828;
+
+    font-size: 0.92rem;
+}
+
+.delete-item-modal-actions {
+    margin-top: 28px;
+    padding-top: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+
+    border-top:
+        1px solid var(--border-light);
+}
+
+.delete-item-modal-actions .btn {
+    min-width: 170px;
+}
+
+.delete-item-confirm-btn {
+    border: 1px solid #dc2626;
+
+    background-color: #dc2626;
+    color: #ffffff;
+}
+
+.delete-item-confirm-btn:hover {
+    background-color: #b91c1c;
+}
+
+@media (max-width: 520px) {
+    .delete-item-modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .delete-item-modal-actions .btn {
+        width: 100%;
+        min-width: 0;
+    }
+}

@@ -199,3 +199,649 @@ body.high-contrast.magnifier-enabled .magnify-active {
   background-color: #000000 !important;
   box-shadow: 0 0 15px rgba(255,255,255,0.3) !important;
 }
+
+/* override high contrast tool */
+
+body.high-contrast {
+    color: #ffffff;
+}
+
+body.high-contrast h1,
+body.high-contrast h2,
+body.high-contrast h3,
+body.high-contrast h4,
+body.high-contrast h5,
+body.high-contrast h6,
+body.high-contrast p,
+body.high-contrast span,
+body.high-contrast label,
+body.high-contrast strong,
+body.high-contrast small,
+body.high-contrast li,
+body.high-contrast a,
+body.high-contrast td,
+body.high-contrast th {
+    color: #ffffff !important;
+}
+
+body.high-contrast .text-muted,
+body.high-contrast .field-label,
+body.high-contrast .section-subtitle,
+body.high-contrast .resident-card-meta,
+body.high-contrast .dashboard-subtitle,
+body.high-contrast .medication-field-hint {
+    color: #ffffff !important;
+}
+
+body.high-contrast * {
+    border-color: #ffffff55;
+}
+
+body.high-contrast input,
+body.high-contrast textarea,
+body.high-contrast select {
+    background: #000;
+    color: white;
+    border: 2px solid white;
+}
+
+body.high-contrast input::placeholder,
+body.high-contrast textarea::placeholder {
+    color: #cccccc;
+}
+
+body.high-contrast button {
+    color: white;
+}
+
+body.high-contrast .stat-card,
+body.high-contrast .resident-card,
+body.high-contrast .dashboard-card {
+    color: white;
+}
+
+body.high-contrast .dashboard-card-badge,
+body.high-contrast .status-badge,
+body.high-contrast .system-status {
+    background: #f2f2f2;
+    color: #000 !important;
+    border: 2px solid #fff;
+}
+
+body.high-contrast .quick-action-card {
+    background: #ffffff;
+    color: #000;
+}
+
+body.high-contrast .quick-action-card h4,
+body.high-contrast .quick-action-card p {
+    color: #000 !important;
+}
+
+body.high-contrast .system-status {
+    background: yellow;
+    color: black;
+}
+
+body.high-contrast .user-avatar,
+body.high-contrast .profile-avatar {
+    background: #ffeb00;
+    color: #000;
+    border: 2px solid #fff;
+}
+
+body.high-contrast .sidebar svg,
+body.high-contrast .sidebar i,
+body.high-contrast .sidebar .icon {
+    color: #ffeb00 !important;
+}
+
+body.high-contrast .resident-avatar {
+    background: #ffeb00;
+    color: #000;
+}
+
+body.high-contrast .dashboard-card-icon {
+    color: #ffeb00;
+}
+
+/* ================================
+   HIGH CONTRAST - QUICK ACTIONS
+================================ */
+
+body.high-contrast .quick-action-card {
+    background: #ffffff;
+    color: #000;
+    border: 2px solid #ffffff;
+}
+
+body.high-contrast .quick-action-card strong {
+    color: #000 !important;
+}
+
+body.high-contrast .quick-action-card small {
+    color: #222 !important;
+}
+
+body.high-contrast .quick-action-icon {
+    background: #ffeb00;
+    color: #000;
+}
+
+body.high-contrast .card-icon-circle {
+    filter: saturate(0) brightness(3);
+}
+
+body.high-contrast .status-badge {
+    background: transparent;
+    color: #ffeb00;
+    border: 2px solid #ffeb00;
+}
+
+body.high-contrast .overview-status {
+    background: #ffffff;
+    color: #000;
+    border: 2px solid #ffffff;
+}
+
+/* =========================================
+   HIGH CONTRAST FIXES
+========================================= */
+
+/* Secure session badge */
+body.high-contrast .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    background-color: #000;
+    color: #ffeb00 !important;
+
+    border: 2px solid #ffeb00;
+}
+
+body.high-contrast .status-badge,
+body.high-contrast .status-badge span {
+    color: #ffeb00 !important;
+}
+
+/* System overview rows */
+body.high-contrast .overview-row {
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+body.high-contrast .overview-row > span {
+    color: #fff !important;
+}
+
+/* System overview badges */
+body.high-contrast .overview-status {
+    min-width: 110px;
+    padding: 7px 12px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: #ffeb00 !important;
+    color: #000 !important;
+
+    border: 2px solid #fff;
+    border-radius: 8px;
+
+    font-size: 0.68rem;
+    font-weight: 900;
+    line-height: 1;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+/* Prevent broad white-text rules from overriding badge text */
+body.high-contrast .overview-status strong,
+body.high-contrast strong.overview-status {
+    color: #000 !important;
+}
+
+/* =========================================
+   HIGH CONTRAST - RESIDENT CARDS
+========================================= */
+
+/* Resident initials avatar */
+body.high-contrast .resident-card-avatar {
+    background-color: #ffeb00 !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff;
+}
+
+/* Edit and delete icon buttons */
+body.high-contrast .resident-icon-btn {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+}
+
+/* Make the symbols inside visible too */
+body.high-contrast .resident-icon-btn,
+body.high-contrast .resident-icon-btn span,
+body.high-contrast .resident-icon-btn svg,
+body.high-contrast .resident-icon-btn i {
+    color: #000000 !important;
+    fill: #000000 !important;
+}
+
+/* Delete button stays clearly destructive */
+body.high-contrast .resident-icon-btn.delete {
+    background-color: #ffeb00 !important;
+    color: #000000 !important;
+    border-color: #ffffff !important;
+}
+
+body.high-contrast .resident-icon-btn.delete:hover {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+/* Keep resident text readable */
+body.high-contrast .resident-card-name,
+body.high-contrast .resident-card-room,
+body.high-contrast .resident-detail-label,
+body.high-contrast .resident-detail-value {
+    color: #ffffff !important;
+}
+
+body.high-contrast .add-resident-btn {
+    color: #000 !important;
+}
+
+/* ==============================
+   High Contrast - Profile Page
+================================ */
+
+body.high-contrast .profile-action-btn {
+    background: #ffffff !important;
+    color: #000 !important;
+    border: 2px solid #ffffff !important;
+}
+
+body.high-contrast .profile-action-btn strong,
+body.high-contrast .profile-action-btn small {
+    color: #000 !important;
+}
+
+body.high-contrast .profile-action-icon {
+    background: #ffe600 !important;
+    color: #000 !important;
+    border-radius: 12px;
+}
+
+body.high-contrast .profile-danger-action {
+    background: #ffeaea !important;
+    border-color: #ff4d4d !important;
+}
+
+body.high-contrast .profile-danger-action strong,
+body.high-contrast .profile-danger-action small {
+    color: #b00020 !important;
+}
+
+body.high-contrast .user-avatar {
+    background: #ffe600 !important;
+    color: #000 !important;
+    border: 2px solid #ffffff !important;
+}
+
+body.high-contrast .user-panel {
+    background: #111 !important;
+    border: 2px solid #ffffff !important;
+}
+
+body.high-contrast .user-name,
+body.high-contrast .user-plan {
+    color: #ffffff !important;
+}
+
+body.high-contrast .profile-avatar-large {
+    background: #ffe600 !important;
+    color: #000 !important;
+    border: 2px solid #ffffff !important;
+}
+
+/* =========================================
+   CLEAN DASHBOARD BACKGROUND OVERRIDES
+========================================= */
+
+body:not(.high-contrast) main,
+body:not(.high-contrast) .main-content,
+body:not(.high-contrast) .dashboard-main,
+body:not(.high-contrast) .dashboard-content,
+body:not(.high-contrast) .dashboard-page {
+    background-color: #f4f1ed !important;
+}
+
+/* =========================================
+   HIGH CONTRAST - RESIDENT DETAILS
+========================================= */
+
+/* Main page background */
+body.high-contrast .content-body {
+    background-color: #6d6966 !important;
+}
+
+/* Main resident panels */
+body.high-contrast .resident-hero-card,
+body.high-contrast .resident-detail-panel,
+body.high-contrast .resident-section-nav,
+body.high-contrast .resident-side-card {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+/* Resident avatar */
+body.high-contrast .resident-hero-avatar {
+    background-color: #ffe600 !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+}
+
+/* Overview and emergency information cards */
+body.high-contrast .resident-information-item,
+body.high-contrast .emergency-information-item {
+    background-color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+/* Labels and values inside light cards */
+body.high-contrast .resident-information-item span,
+body.high-contrast .resident-information-item strong,
+body.high-contrast .emergency-information-item span,
+body.high-contrast .emergency-information-item strong {
+    color: #000000 !important;
+}
+
+/* Long information boxes */
+body.high-contrast .resident-long-information article {
+    background-color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+body.high-contrast .resident-long-information article span,
+body.high-contrast .resident-long-information article p {
+    color: #000000 !important;
+}
+
+/* Section navigation */
+body.high-contrast .resident-section-nav a {
+    color: #ffffff !important;
+}
+
+body.high-contrast .resident-section-nav a:hover,
+body.high-contrast .resident-section-nav a:focus-visible {
+    background-color: #ffe600 !important;
+    color: #000000 !important;
+}
+
+/* Back link */
+body.high-contrast .back-to-residents-link {
+    color: #ffffff !important;
+}
+
+body.high-contrast .back-to-residents-link:hover {
+    color: #ffe600 !important;
+}
+
+/* Readiness status */
+body.high-contrast .emergency-readiness-status {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+}
+
+body.high-contrast .emergency-readiness-status,
+body.high-contrast .emergency-readiness-status span {
+    color: #000000 !important;
+}
+
+/* Sidebar quick actions */
+body.high-contrast .resident-quick-action-btn {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+}
+
+body.high-contrast .resident-quick-action-content strong,
+body.high-contrast .resident-quick-action-content small {
+    color: #000000 !important;
+}
+
+body.high-contrast .resident-quick-action-icon {
+    background-color: #ffe600 !important;
+    color: #000000 !important;
+    border-radius: 12px;
+}
+
+/* Outline buttons in main panels */
+body.high-contrast #editResidentBtn,
+body.high-contrast #editEmergencyBtn {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+body.high-contrast #editResidentBtn:hover,
+body.high-contrast #editEmergencyBtn:hover {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+/* Accent buttons */
+body.high-contrast #addMedicationBtn,
+body.high-contrast #uploadRecordBtn {
+    background-color: #ffe600 !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+}
+
+/* Make button text and plus symbols black */
+body.high-contrast #addMedicationBtn *,
+body.high-contrast #uploadRecordBtn * {
+    color: #000000 !important;
+}
+
+/* =========================================
+   HIGH CONTRAST - MEDICAL RECORDS
+========================================= */
+
+body.high-contrast .medical-record-card {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+}
+
+/* Record title, category, date, description and filename */
+body.high-contrast .medical-record-card h3,
+body.high-contrast .medical-record-card p,
+body.high-contrast .medical-record-card span,
+body.high-contrast .medical-record-card strong {
+    color: #000000 !important;
+}
+
+/* PDF icon box */
+body.high-contrast .medical-record-file-icon,
+body.high-contrast .medical-record-icon {
+    background-color: #ffe600 !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+}
+
+/* Make PDF text visible */
+body.high-contrast .medical-record-file-icon *,
+body.high-contrast .medical-record-icon * {
+    color: #000000 !important;
+}
+
+/* Preview button */
+body.high-contrast .medical-record-preview-btn {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+}
+
+/* AI summary button */
+body.high-contrast .medical-record-summary-btn {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+/* Delete button */
+body.high-contrast .medical-record-delete-btn {
+    background-color: #ffeaea !important;
+    color: #b00020 !important;
+    border: 2px solid #ff4d4d !important;
+}
+
+/* AI summary container */
+body.high-contrast .ai-summary-panel,
+body.high-contrast .ai-summary-container {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+}
+
+/* AI summary headings */
+body.high-contrast .ai-summary-panel h3,
+body.high-contrast .ai-summary-container h3,
+body.high-contrast .ai-summary-header p,
+body.high-contrast .ai-summary-header span {
+    color: #000000 !important;
+}
+
+/* AI warning remains readable */
+body.high-contrast .ai-summary-warning {
+    background-color: #fff7cc !important;
+    color: #7a3e00 !important;
+    border: 2px solid #ffe600 !important;
+}
+
+body.high-contrast .ai-summary-warning * {
+    color: #7a3e00 !important;
+}
+
+/* Individual summary cards */
+body.high-contrast .ai-summary-overview,
+body.high-contrast .ai-summary-list-card {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+body.high-contrast .ai-summary-overview *,
+body.high-contrast .ai-summary-list-card * {
+    color: #ffffff !important;
+}
+
+/* =========================================
+   HIGH CONTRAST - MEDICATIONS
+========================================= */
+
+body.high-contrast .medication-card {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+}
+
+/* Medication name and dosage */
+body.high-contrast .medication-card-identity h3,
+body.high-contrast .medication-card-identity p {
+    color: #000000 !important;
+}
+
+/* Medication icon */
+body.high-contrast .medication-card-icon {
+    background-color: #ffe600 !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+}
+
+/* Status badge */
+body.high-contrast .medication-status {
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+}
+
+body.high-contrast .medication-status-active {
+    background-color: #b8f5c8 !important;
+}
+
+body.high-contrast .medication-status-paused {
+    background-color: #ffe600 !important;
+}
+
+body.high-contrast .medication-status-completed {
+    background-color: #dddddd !important;
+}
+
+/* Medication information boxes */
+body.high-contrast .medication-details-grid article,
+body.high-contrast .medication-instructions,
+body.high-contrast .medication-notes {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+body.high-contrast .medication-details-grid article span,
+body.high-contrast .medication-details-grid article strong,
+body.high-contrast .medication-instructions span,
+body.high-contrast .medication-instructions p,
+body.high-contrast .medication-notes span,
+body.high-contrast .medication-notes p {
+    color: #ffffff !important;
+}
+
+/* Edit medication */
+body.high-contrast .medication-action-btn {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+/* Delete medication */
+body.high-contrast .medication-action-btn.delete {
+    background-color: #ffeaea !important;
+    color: #b00020 !important;
+    border: 2px solid #ff4d4d !important;
+}
+
+/* =========================================
+   HIGH CONTRAST - RESIDENT TIMELINE
+========================================= */
+
+body.high-contrast .timeline-date-label {
+    color: #ffffff !important;
+}
+
+body.high-contrast .timeline-events::before {
+    background-color: #ffffff !important;
+}
+
+body.high-contrast .timeline-event-marker {
+    background-color: #ffe600 !important;
+    color: #000000 !important;
+    border: 2px solid #ffffff !important;
+}
+
+body.high-contrast .timeline-event-content {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+body.high-contrast .timeline-event-header h4,
+body.high-contrast .timeline-event-header time,
+body.high-contrast .timeline-event-description,
+body.high-contrast .timeline-event-meta {
+    color: #ffffff !important;
+}
