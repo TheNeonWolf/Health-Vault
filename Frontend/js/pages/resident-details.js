@@ -1,41 +1,10 @@
 let currentResident = null;
 let residentId = null;
+let careTaskFilter = "all";
 let medicalRecords = [];
 let medications = [];
+let careTasks = [];
 let summarizingRecordIds = new Set();
-
-document.addEventListener("DOMContentLoaded", async () => {
-    document
-        .getElementById("logoutBtn")
-        ?.addEventListener("click", logout);
-
-    const user = await requireAuth();
-
-    if (!user) {
-        return;
-    }
-
-    displaySidebarUser(user);
-    setupResidentDetailEvents();
-
-    residentId = getQueryParameter("id");
-
-    if (!residentId) {
-        showMessage(
-            document.getElementById("residentDetailsMessage"),
-            "No resident was selected."
-        );
-
-        return;
-    }
-
-    await loadResident();
-    await Promise.all([
-        loadMedicalRecords(),
-        loadMedications(),
-    ]);
-    renderResidentTimeline();
-});
 
 const openAddMedicationModal = () => {
     document
@@ -298,6 +267,69 @@ const setupResidentDetailEvents = () => {
     setupOutsideModalClose(
         "deleteItemModal",
         closeDeleteItemModal
+    );
+
+    document
+        .getElementById("openAddCareTaskModalBtn")
+        ?.addEventListener(
+            "click",
+            openAddCareTaskModal
+        );
+
+    document
+        .getElementById("closeCareTaskModalBtn")
+        ?.addEventListener(
+            "click",
+            closeCareTaskModal
+        );
+
+    document
+        .getElementById("cancelCareTaskBtn")
+        ?.addEventListener(
+            "click",
+            closeCareTaskModal
+        );
+
+    document
+        .getElementById("careTaskForm")
+        ?.addEventListener(
+            "submit",
+            handleCareTaskSubmit
+        );
+
+    document
+        .getElementById("careTaskDate")
+        ?.addEventListener(
+            "change",
+            loadCareTasks
+        );
+
+    document
+        .querySelectorAll("[data-care-filter]")
+        .forEach((button) => {
+            button.addEventListener(
+                "click",
+                () => {
+                
+                    careTaskFilter =
+                        button.dataset.careFilter;
+                
+                    document
+                        .querySelectorAll("[data-care-filter]")
+                        .forEach((btn) =>
+                            btn.classList.remove("active")
+                        );
+                    
+                    button.classList.add("active");
+                    
+                    renderCareTasks();
+                }
+            );
+        });
+
+    setupOutsideModalClose(
+        "careTaskModal",
+        closeCareTaskModal
     );
 };
 
@@ -884,6 +916,39 @@ const setText = (elementId, value) => {
         element.textContent =
             String(value ?? "");
     }
+};
+
+const getLocalDateInputValue = (date = new Date()) => {
+    const year = date.getFullYear();
+
+    const month = String(
+        date.getMonth() + 1
+    ).padStart(2, "0");
+
+    const day = String(
+        date.getDate()
+    ).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+};
+
+const setCareTaskDateToToday = () => {
+    const dateInput =
+        document.getElementById("careTaskDate");
+
+    if (dateInput && !dateInput.value) {
+        dateInput.value =
+            getLocalDateInputValue();
+    }
+};
+
+const getSelectedCareTaskDate = () => {
+    return (
+        document
+            .getElementById("careTaskDate")
+            ?.value ||
+        getLocalDateInputValue()
+    );
 };
 
 const openUploadRecordModal = () => {
@@ -2969,3 +3034,805 @@ const formatTimelineTime = (
         }
     );
 };
+
+const loadCareTasks = async () => {
+    const listElement =
+        document.getElementById(
+            "careTaskList"
+        );
+
+    if (!listElement || !residentId) {
+        return;
+    }
+
+    const selectedDate =
+        getSelectedCareTaskDate();
+
+    try {
+        clearMessage(
+            document.getElementById(
+                "careTaskMessage"
+            )
+        );
+
+        listElement.innerHTML = `
+            <div class="care-task-loading">
+                Loading checklist...
+            </div>
+        `;
+
+        const response = await apiRequest(
+            `/care-tasks/resident/${encodeURIComponent(
+                residentId
+            )}?date=${encodeURIComponent(
+                selectedDate
+            )}`
+        );
+
+        careTasks =
+            response?.tasks ||
+            response?.data ||
+            response ||
+            [];
+
+        if (!Array.isArray(careTasks)) {
+            careTasks = [];
+        }
+
+        sortCareTasks();
+        renderCareTasks();
+    } catch (error) {
+        console.error(
+            "Care task loading error:",
+            error
+        );
+
+        careTasks = [];
+
+        updateCareTaskProgress();
+
+        listElement.innerHTML = `
+            <div class="care-task-empty">
+                <strong>
+                    Unable to load the checklist
+                </strong>
+
+                <p>
+                    ${escapeHtml(
+                        error.data?.message ||
+                        error.message ||
+                        "Please try again."
+                    )}
+                </p>
+            </div>
+        `;
+    }
+};
+
+const sortCareTasks = () => {
+    careTasks.sort(
+        (firstTask, secondTask) => {
+            const firstTime =
+                firstTask.scheduledTime ||
+                "99:99";
+
+            const secondTime =
+                secondTask.scheduledTime ||
+                "99:99";
+
+            const timeComparison =
+                firstTime.localeCompare(
+                    secondTime
+                );
+
+            if (timeComparison !== 0) {
+                return timeComparison;
+            }
+
+            return (
+                new Date(
+                    firstTask.createdAt || 0
+                ) -
+                new Date(
+                    secondTask.createdAt || 0
+                )
+            );
+        }
+    );
+};
+
+const getFilteredCareTasks = () => {
+    if (careTaskFilter === "pending") {
+        return careTasks.filter(
+            (task) => !task.isCompleted
+        );
+    }
+
+    if (careTaskFilter === "completed") {
+        return careTasks.filter(
+            (task) => task.isCompleted
+        );
+    }
+
+    return careTasks;
+};
+
+const updateCareTaskProgress = () => {
+    const progressText =
+        document.getElementById(
+            "careTaskProgressText"
+        );
+
+    const progressBar =
+        document.getElementById(
+            "careTaskProgressBar"
+        );
+
+    const progressFill =
+        document.getElementById(
+            "careTaskProgressFill"
+        );
+
+    const total = careTasks.length;
+
+    const completed =
+        careTasks.filter(
+            (task) => task.isCompleted
+        ).length;
+
+    const percentage =
+        total > 0
+            ? Math.round(
+                  (completed / total) * 100
+              )
+            : 0;
+
+    if (progressText) {
+        progressText.textContent =
+            `${completed} / ${total} completed`;
+    }
+
+    if (progressBar) {
+        progressBar.setAttribute(
+            "aria-valuenow",
+            String(percentage)
+        );
+    }
+
+    if (progressFill) {
+        progressFill.style.width =
+            `${percentage}%`;
+    }
+};
+
+const createCareTaskCard = (task) => {
+    const id =
+        task._id ||
+        task.id ||
+        "";
+
+    const title =
+        task.title ||
+        "Untitled care task";
+
+    const notes =
+        task.notes ||
+        "";
+
+    const scheduledTime =
+        task.scheduledTime ||
+        "";
+
+    const completedText =
+        task.isCompleted &&
+        task.completedAt
+            ? `Completed ${formatTimelineTime(
+                  task.completedAt
+              )}`
+            : "";
+
+    return `
+        <article
+            class="care-task-card ${
+                task.isCompleted
+                    ? "completed"
+                    : ""
+            }"
+        >
+            <input
+                type="checkbox"
+                class="care-task-check"
+                data-toggle-care-task="${escapeHtml(
+                    id
+                )}"
+                aria-label="${escapeHtml(
+                    task.isCompleted
+                        ? `Mark ${title} as pending`
+                        : `Mark ${title} as completed`
+                )}"
+                ${
+                    task.isCompleted
+                        ? "checked"
+                        : ""
+                }
+            >
+
+            <div class="care-task-content">
+                <div class="care-task-title-row">
+                    <h3 class="care-task-title">
+                        ${escapeHtml(title)}
+                    </h3>
+
+                    ${
+                        scheduledTime
+                            ? `
+                                <span class="care-task-time">
+                                    ${escapeHtml(
+                                        formatCareTaskTime(
+                                            scheduledTime
+                                        )
+                                    )}
+                                </span>
+                            `
+                            : ""
+                    }
+                </div>
+
+                ${
+                    notes
+                        ? `
+                            <p class="care-task-notes">
+                                ${escapeHtml(notes)}
+                            </p>
+                        `
+                        : ""
+                }
+
+                ${
+                    completedText
+                        ? `
+                            <span class="care-task-completed-time">
+                                ${escapeHtml(
+                                    completedText
+                                )}
+                            </span>
+                        `
+                        : ""
+                }
+            </div>
+
+            <div class="care-task-actions">
+                <button
+                    type="button"
+                    class="care-task-action-btn"
+                    data-edit-care-task="${escapeHtml(
+                        id
+                    )}"
+                    title="Edit task"
+                >
+                    Edit
+                </button>
+
+                <button
+                    type="button"
+                    class="care-task-action-btn care-task-delete-btn"
+                    data-delete-care-task="${escapeHtml(
+                        id
+                    )}"
+                    title="Delete task"
+                >
+                    Delete
+                </button>
+            </div>
+        </article>
+    `;
+};
+
+const formatCareTaskTime = (timeValue) => {
+    if (!timeValue) {
+        return "";
+    }
+
+    const [hourText, minuteText] =
+        String(timeValue).split(":");
+
+    const hour = Number(hourText);
+    const minute = Number(
+        minuteText || 0
+    );
+
+    if (
+        !Number.isInteger(hour) ||
+        hour < 0 ||
+        hour > 23 ||
+        !Number.isInteger(minute) ||
+        minute < 0 ||
+        minute > 59
+    ) {
+        return String(timeValue);
+    }
+
+    const date = new Date();
+
+    date.setHours(
+        hour,
+        minute,
+        0,
+        0
+    );
+
+    return date.toLocaleTimeString(
+        undefined,
+        {
+            hour: "numeric",
+            minute: "2-digit",
+        }
+    );
+};
+
+const renderCareTasks = () => {
+    const listElement =
+        document.getElementById(
+            "careTaskList"
+        );
+
+    if (!listElement) {
+        return;
+    }
+
+    updateCareTaskProgress();
+
+    const filteredTasks =
+        getFilteredCareTasks();
+
+    if (filteredTasks.length === 0) {
+        const emptyMessage =
+            careTasks.length === 0
+                ? "No care tasks have been added for this date."
+                : `No ${careTaskFilter} tasks for this date.`;
+
+        listElement.innerHTML = `
+            <div class="care-task-empty">
+                <span aria-hidden="true">
+                    ✅
+                </span>
+
+                <h3>Nothing to show</h3>
+
+                <p>
+                    ${escapeHtml(emptyMessage)}
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+    listElement.innerHTML =
+        filteredTasks
+            .map(createCareTaskCard)
+            .join("");
+
+    listElement
+        .querySelectorAll(
+            "[data-toggle-care-task]"
+        )
+        .forEach((checkbox) => {
+            checkbox.addEventListener(
+                "change",
+                () => {
+                    toggleCareTask(
+                        checkbox.dataset
+                            .toggleCareTask
+                    );
+                }
+            );
+        });
+
+    listElement
+        .querySelectorAll(
+            "[data-edit-care-task]"
+        )
+        .forEach((button) => {
+            button.addEventListener(
+                "click",
+                () => {
+                    openEditCareTaskModal(
+                        button.dataset
+                            .editCareTask
+                    );
+                }
+            );
+        });
+
+    listElement
+        .querySelectorAll(
+            "[data-delete-care-task]"
+        )
+        .forEach((button) => {
+            button.addEventListener(
+                "click",
+                () => {
+                    deleteCareTask(
+                        button.dataset
+                            .deleteCareTask
+                    );
+                }
+            );
+        });
+};
+
+const openAddCareTaskModal = () => {
+    document
+        .getElementById("careTaskForm")
+        ?.reset();
+
+    setValue("editingCareTaskId", "");
+
+    setValue(
+        "careTaskFormDate",
+        getSelectedCareTaskDate()
+    );
+
+    clearMessage(
+        document.getElementById(
+            "careTaskFormMessage"
+        )
+    );
+
+    const title =
+        document.getElementById(
+            "careTaskModalTitle"
+        );
+
+    const saveButton =
+        document.getElementById(
+            "saveCareTaskBtn"
+        );
+
+    if (title) {
+        title.textContent =
+            "Add Care Task";
+    }
+
+    if (saveButton) {
+        saveButton.textContent =
+            "Add Task";
+    }
+
+    openModal("careTaskModal");
+
+    document
+        .getElementById("careTaskTitle")
+        ?.focus();
+};
+
+const closeCareTaskModal = () => {
+    closeModal("careTaskModal");
+
+    document
+        .getElementById("careTaskForm")
+        ?.reset();
+
+    setValue(
+        "editingCareTaskId",
+        ""
+    );
+
+    clearMessage(
+        document.getElementById(
+            "careTaskFormMessage"
+        )
+    );
+};
+
+const openEditCareTaskModal = (taskId) => {
+    const task =
+        careTasks.find(
+            (item) =>
+                String(
+                    item._id ||
+                    item.id
+                ) ===
+                String(taskId)
+        );
+
+    if (!task) {
+        return;
+    }
+
+    clearMessage(
+        document.getElementById(
+            "careTaskFormMessage"
+        )
+    );
+
+    setValue(
+        "editingCareTaskId",
+        taskId
+    );
+
+    setValue(
+        "careTaskTitle",
+        task.title
+    );
+
+    setValue(
+        "careTaskScheduledTime",
+        task.scheduledTime
+    );
+
+    setValue(
+        "careTaskFormDate",
+        toDateInputValue(task.date)
+    );
+
+    setValue(
+        "careTaskNotes",
+        task.notes
+    );
+
+    document.getElementById(
+        "careTaskModalTitle"
+    ).textContent =
+        "Edit Care Task";
+
+    document.getElementById(
+        "saveCareTaskBtn"
+    ).textContent =
+        "Save Changes";
+
+    openModal("careTaskModal");
+};
+
+const handleCareTaskSubmit = async (event) => {
+    event.preventDefault();
+
+    const messageElement =
+        document.getElementById(
+            "careTaskFormMessage"
+        );
+
+    const saveButton =
+        document.getElementById(
+            "saveCareTaskBtn"
+        );
+
+    clearMessage(messageElement);
+
+    const taskId =
+        getValue("editingCareTaskId");
+
+    const title =
+        getValue("careTaskTitle");
+
+    const date =
+        getValue("careTaskFormDate");
+
+    if (!title) {
+        showMessage(
+            messageElement,
+            "Please enter a task title.",
+            "info"
+        );
+
+        return;
+    }
+
+    if (!date) {
+        showMessage(
+            messageElement,
+            "Please select a date.",
+            "info"
+        );
+
+        return;
+    }
+
+    const body = {
+        resident: residentId,
+        title,
+
+        notes:
+            getValue("careTaskNotes"),
+
+        scheduledTime:
+            getValue(
+                "careTaskScheduledTime"
+            ),
+
+        date,
+    };
+
+    const isEditing =
+        Boolean(taskId);
+
+    try {
+        setButtonLoading(
+            saveButton,
+            true,
+            isEditing
+                ? "Saving..."
+                : "Adding..."
+        );
+
+        await apiRequest(
+            isEditing
+                ? `/care-tasks/${encodeURIComponent(
+                      taskId
+                  )}`
+                : "/care-tasks",
+            {
+                method:
+                    isEditing
+                        ? "PUT"
+                        : "POST",
+
+                body,
+            }
+        );
+
+        setValue(
+            "careTaskDate",
+            date
+        );
+
+        clearMessage(messageElement);
+        closeCareTaskModal();
+
+        await loadCareTasks();
+
+        showMessage(
+            document.getElementById(
+                "careTaskMessage"
+            ),
+            isEditing
+                ? "Care task updated successfully."
+                : "Care task added successfully.",
+            "success"
+        );
+    } catch (error) {
+        console.error(
+            "Care task save error:",
+            error
+        );
+
+        showMessage(
+            messageElement,
+            error.data?.message ||
+                error.message ||
+                "Unable to save the task.",
+            "info"
+        );
+    } finally {
+        setButtonLoading(
+            saveButton,
+            false
+        );
+    }
+};
+
+const toggleCareTask = async (taskId) => {
+    const task = careTasks.find(
+        (item) =>
+            String(item._id || item.id) ===
+            String(taskId)
+    );
+
+    if (!task) {
+        return;
+    }
+
+    const previousValue = task.isCompleted;
+
+    task.isCompleted = !task.isCompleted;
+
+    task.completedAt = task.isCompleted
+        ? new Date().toISOString()
+        : null;
+
+    renderCareTasks();
+
+    try {
+        await apiRequest(
+            `/care-tasks/${encodeURIComponent(taskId)}/toggle`,
+            {
+                method: "PATCH",
+            }
+        );
+
+        await loadCareTasks();
+    } catch (error) {
+        task.isCompleted = previousValue;
+
+        renderCareTasks();
+
+        showMessage(
+            document.getElementById("careTaskMessage"),
+            error.data?.message ||
+                error.message ||
+                "Unable to update task."
+        );
+    }
+};
+
+const deleteCareTask = (taskId) => {
+    const task = careTasks.find(
+        (item) =>
+            String(item._id || item.id) ===
+            String(taskId)
+    );
+
+    const taskTitle =
+        task?.title ||
+        "this care task";
+
+    openDeleteItemModal({
+        title: "Delete care task?",
+
+        description:
+            `You are about to delete "${taskTitle}".`,
+
+        buttonText: "Delete task",
+
+        onConfirm: async () => {
+            await apiRequest(
+                `/care-tasks/${encodeURIComponent(taskId)}`,
+                {
+                    method: "DELETE",
+                }
+            );
+
+            careTasks = careTasks.filter(
+                (item) =>
+                    String(item._id || item.id) !==
+                    String(taskId)
+            );
+
+            renderCareTasks();
+
+            showMessage(
+                document.getElementById(
+                    "careTaskMessage"
+                ),
+                "Care task deleted successfully.",
+                "success"
+            );
+        },
+    });
+};
+
+document.addEventListener("DOMContentLoaded", async () => {
+    document
+        .getElementById("logoutBtn")
+        ?.addEventListener("click", logout);
+
+    const user = await requireAuth();
+
+    if (!user) {
+        return;
+    }
+
+    displaySidebarUser(user);
+    setupResidentDetailEvents();
+
+    residentId = getQueryParameter("id");
+
+    if (!residentId) {
+        showMessage(
+            document.getElementById("residentDetailsMessage"),
+            "No resident was selected."
+        );
+
+        return;
+    }
+
+    await loadResident();
+    setCareTaskDateToToday();
+    await Promise.all([
+        loadMedicalRecords(),
+        loadMedications(),
+        loadCareTasks()
+    ]);
+    renderResidentTimeline();
+});

@@ -367,6 +367,8 @@
     max-height: 90vh;
     padding: 32px;
     overflow-y: auto;
+
+    animation: residentModalEnter 0.22s ease;
 }
 
 .resident-modal-grid {
@@ -493,7 +495,7 @@
     padding: 18px;
 
     display: grid;
-    grid-template-columns: 54px minmax(0, 1fr) auto;
+    grid-template-columns: 54px minmax(0, 1fr);
     align-items: center;
     gap: 16px;
 
@@ -582,9 +584,12 @@
 }
 
 .medical-record-actions {
+    grid-column: 1 / -1;
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 8px;
+    padding-top: 4px;
 }
 
 .medical-record-actions .btn {
@@ -643,15 +648,6 @@
    AI MEDICAL RECORD SUMMARY
 ========================================= */
 
-.medical-record-card {
-    grid-template-columns: 54px minmax(0, 1fr);
-}
-
-.medical-record-actions {
-    grid-column: 1 / -1;
-    justify-content: flex-end;
-    padding-top: 4px;
-}
 
 .medical-record-summary-btn {
     padding: 9px 12px;
@@ -1335,4 +1331,775 @@
         width: 100%;
         min-width: 0;
     }
+}
+
+/* =====================================================
+   CARE TASK MODAL BACKDROP
+===================================================== */
+
+#careTaskModal,
+#deleteCareTaskModal {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+
+    background: rgba(22, 22, 48, 0.55);
+    backdrop-filter: blur(5px);
+}
+
+#careTaskModal.active {
+    display: flex;
+}
+
+#deleteCareTaskModal.active,
+#deleteCareTaskModal[aria-hidden="false"] {
+    display: flex;
+}
+
+
+/* =====================================================
+   SHARED MODAL CONTENT
+===================================================== */
+
+#careTaskModal .modal-content,
+#deleteCareTaskModal .modal-content {
+    position: relative;
+
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+
+    padding: 32px;
+
+    background: #ffffff;
+    border: 1px solid #e7e3e9;
+    border-radius: 24px;
+
+    box-shadow:
+        0 24px 70px rgba(25, 24, 55, 0.24);
+
+    animation: residentModalEnter 0.22s ease;
+}
+
+@keyframes residentModalEnter {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* =====================================================
+   CARE TASK MODAL HEADER
+===================================================== */
+
+#careTaskModal .modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+
+    margin-bottom: 24px;
+}
+
+#careTaskModal .section-eyebrow {
+    margin: 0 0 6px;
+
+    color: #a18480;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+#careTaskModal .modal-header h2 {
+    margin: 0;
+
+    color: #20203f;
+    font-size: 2rem;
+    line-height: 1.15;
+}
+
+
+/* =====================================================
+   CLOSE BUTTONS
+===================================================== */
+
+#careTaskModal .modal-close-btn,
+#deleteCareTaskModal .modal-close-btn {
+    padding: 0;
+    border: none;
+    background: transparent;
+
+    color: #56536d;
+
+    font-family: inherit;
+    font-size: 2rem;
+    font-weight: 400;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+
+/* =====================================================
+   CARE TASK FORM
+===================================================== */
+
+#careTaskForm {
+    display: grid;
+    gap: 18px;
+}
+
+#careTaskForm .form-group {
+    display: grid;
+    gap: 8px;
+}
+
+#careTaskForm .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+#careTaskForm label {
+    color: #34334f;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+#careTaskForm input,
+#careTaskForm textarea {
+    width: 100%;
+
+    padding: 13px 15px;
+
+    color: #292844;
+    background: #faf9fb;
+    border: 1px solid #ddd8e0;
+    border-radius: 12px;
+
+    font: inherit;
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+#careTaskForm input::placeholder,
+#careTaskForm textarea::placeholder {
+    color: #9b98a8;
+}
+
+#careTaskForm input:focus,
+#careTaskForm textarea:focus {
+    background: #ffffff;
+    border-color: #7a668e;
+    box-shadow:
+        0 0 0 4px rgba(122, 102, 142, 0.13);
+}
+
+#careTaskForm textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+
+/* =====================================================
+   FORM MESSAGE
+===================================================== */
+
+#careTaskForm .form-message {
+    display: none;
+    margin: 0;
+
+    padding: 11px 14px;
+
+    color: #9c3030;
+    background: #fff0f0;
+    border: 1px solid #f4cccc;
+    border-radius: 10px;
+
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+#careTaskForm .form-message:not(:empty) {
+    display: block;
+}
+
+#careTaskForm .form-message.success {
+    color: #237044;
+    background: #ecf8f1;
+    border-color: #c8ead6;
+}
+
+
+/* =====================================================
+   MODAL ACTION BUTTONS
+===================================================== */
+
+#careTaskModal .modal-actions,
+#deleteCareTaskModal .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+
+    margin-top: 8px;
+    padding-top: 20px;
+
+    border-top: 1px solid #ece8ee;
+}
+
+#careTaskModal .modal-actions button,
+#deleteCareTaskModal .modal-actions button {
+    min-width: 120px;
+
+    padding: 12px 18px;
+
+    border: none;
+    border-radius: 12px;
+
+    font: inherit;
+    font-weight: 750;
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease,
+        opacity 0.2s ease;
+}
+
+#careTaskModal .secondary-btn,
+#deleteCareTaskModal .secondary-btn {
+    color: #494861;
+    background: #f1eff3;
+}
+
+#careTaskModal .secondary-btn:hover,
+#deleteCareTaskModal .secondary-btn:hover {
+    background: #e7e3e9;
+}
+
+#careTaskModal .primary-btn {
+    color: #ffffff;
+    background: #272645;
+    box-shadow:
+        0 8px 18px rgba(39, 38, 69, 0.2);
+}
+
+#careTaskModal .primary-btn:hover {
+    transform: translateY(-1px);
+    box-shadow:
+        0 10px 22px rgba(39, 38, 69, 0.25);
+}
+
+#deleteCareTaskModal .danger-btn {
+    color: #ffffff;
+    background: #b94848;
+    box-shadow:
+        0 8px 18px rgba(185, 72, 72, 0.22);
+}
+
+#deleteCareTaskModal .danger-btn:hover {
+    transform: translateY(-1px);
+    background: #a93f3f;
+}
+
+
+/* =====================================================
+   DELETE CONFIRMATION MODAL
+===================================================== */
+
+#deleteCareTaskModal .confirmation-modal-content {
+    max-width: 440px;
+    text-align: center;
+}
+
+#deleteCareTaskModal .confirmation-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+#deleteCareTaskModal .confirmation-icon {
+    width: 72px;
+    height: 72px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 18px;
+
+    background: #fff1f1;
+    border-radius: 50%;
+
+    font-size: 2rem;
+}
+
+#deleteCareTaskModal h2 {
+    margin: 0 0 12px;
+
+    color: #20203f;
+    font-size: 1.8rem;
+}
+
+#deleteCareTaskModal p {
+    margin: 0;
+
+    color: #666278;
+    line-height: 1.65;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 640px) {
+    #careTaskModal,
+    #deleteCareTaskModal {
+        padding: 14px;
+    }
+
+    #careTaskModal .modal-content,
+    #deleteCareTaskModal .modal-content {
+        padding: 24px 20px;
+        border-radius: 20px;
+    }
+
+    #careTaskModal .modal-header h2 {
+        font-size: 1.65rem;
+    }
+
+    #careTaskForm .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    #careTaskModal .modal-actions,
+    #deleteCareTaskModal .modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    #careTaskModal .modal-actions button,
+    #deleteCareTaskModal .modal-actions button {
+        width: 100%;
+    }
+}
+
+/* =========================================
+   CARE CHECKLIST
+========================================= */
+
+.care-checklist-section {
+    padding: 32px;
+}
+
+.care-checklist-section .section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.care-checklist-section .section-heading h2 {
+    margin: 0 0 6px;
+}
+
+.care-checklist-section .section-heading p {
+    margin: 0;
+    color: #6c6a7d;
+}
+
+
+/* Toolbar */
+
+.care-checklist-toolbar {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.care-date-field,
+.care-progress-card {
+    padding: 18px;
+    background: #ffffff;
+    border: 1px solid #e5e2e7;
+    border-radius: 14px;
+}
+
+.care-date-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.care-date-field label {
+    color: #4b4961;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+#careTaskDate {
+    width: 100%;
+    padding: 10px 12px;
+    color: #292844;
+    background: #ffffff;
+    border: 1px solid #d8d4dc;
+    border-radius: 8px;
+    font: inherit;
+    outline: none;
+}
+
+#careTaskDate:focus {
+    border-color: #5f5b7a;
+}
+
+
+/* Progress */
+
+.care-progress-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+}
+
+.care-progress-heading {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: #6c6a7d;
+    font-size: 0.88rem;
+}
+
+#careTaskProgressText {
+    color: #292844;
+}
+
+.care-progress-track {
+    height: 8px;
+    overflow: hidden;
+    background: #ece9ee;
+    border-radius: 999px;
+}
+
+.care-progress-fill {
+    width: 0;
+    height: 100%;
+    background: #5f5b7a;
+    border-radius: inherit;
+    transition: width 0.3s ease;
+}
+
+
+/* Filters */
+
+.care-task-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.care-filter-btn {
+    padding: 8px 14px;
+    color: #555269;
+    background: #ffffff;
+    border: 1px solid #dcd8df;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.care-filter-btn:hover {
+    background: #f3f1f4;
+}
+
+.care-filter-btn.active {
+    color: #ffffff;
+    background: #292844;
+    border-color: #292844;
+}
+
+
+/* Message */
+
+#careTaskMessage {
+    display: none;
+    margin: 0 0 16px;
+    padding: 11px 13px;
+    border-radius: 8px;
+}
+
+#careTaskMessage:not(:empty) {
+    display: block;
+}
+
+#careTaskMessage.success {
+    color: #2f6d4d;
+    background: #edf7f1;
+    border: 1px solid #cfe6d7;
+}
+
+
+/* Task list */
+
+.care-task-list {
+    display: grid;
+    gap: 12px;
+}
+
+.care-task-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+
+    padding: 16px;
+
+    background: #ffffff;
+    border: 1px solid #e5e2e7;
+    border-radius: 12px;
+}
+
+.care-task-card.completed {
+    background: #f7f6f8;
+    opacity: 0.75;
+}
+
+.care-task-card.completed .care-task-title {
+    text-decoration: line-through;
+}
+
+
+/* Checkbox */
+
+.care-task-check {
+    width: 20px;
+    height: 20px;
+    accent-color: #5f5b7a;
+}
+
+
+/* Task content */
+
+.care-task-content {
+    min-width: 0;
+}
+
+.care-task-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.care-task-title {
+    margin: 0;
+    color: #292844;
+    font-size: 0.98rem;
+}
+
+.care-task-time {
+    flex-shrink: 0;
+    padding: 4px 8px;
+    color: #5f5b7a;
+    background: #f0edf2;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.care-task-notes {
+    margin: 6px 0 0;
+    color: #6c6a7d;
+    font-size: 0.88rem;
+    line-height: 1.5;
+}
+
+.care-task-completed-time {
+    display: block;
+    margin-top: 6px;
+    color: #4e765f;
+    font-size: 0.78rem;
+}
+
+
+/* Task buttons */
+
+.care-task-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.care-task-action-btn {
+    padding: 7px 10px;
+    color: #4d4a62;
+    background: #f2f0f3;
+    border: none;
+    border-radius: 7px;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.care-task-action-btn:hover {
+    background: #e7e4e9;
+}
+
+.care-task-delete-btn {
+    color: #9a4444;
+    background: #fbeeee;
+}
+
+.care-task-delete-btn:hover {
+    background: #f5dddd;
+}
+
+
+/* Loading and empty state */
+
+.care-task-loading,
+.care-task-empty {
+    padding: 32px 20px;
+    text-align: center;
+    background: #ffffff;
+    border: 1px solid #e5e2e7;
+    border-radius: 12px;
+    color: #6c6a7d;
+}
+
+.care-task-empty span {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1.6rem;
+}
+
+.care-task-empty h3 {
+    margin: 0 0 6px;
+    color: #292844;
+    font-size: 1.1rem;
+}
+
+.care-task-empty p {
+    margin: 0;
+}
+
+
+/* Responsive */
+
+@media (max-width: 760px) {
+    .care-checklist-section .section-heading {
+        flex-direction: column;
+    }
+
+    #openAddCareTaskModalBtn {
+        width: 100%;
+    }
+
+    .care-checklist-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .care-task-card {
+        grid-template-columns: auto 1fr;
+    }
+
+    .care-task-actions {
+        grid-column: 2;
+    }
+}
+
+#openAddCareTaskModalBtn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    min-width: 135px;
+    height: 48px;
+
+    padding: 0 22px;
+
+    border: none;
+    border-radius: 12px;
+
+    background: #2d2a4a;
+    color: #ffffff;
+
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: inherit;
+
+    cursor: pointer;
+
+    box-shadow: 0 8px 18px rgba(45, 42, 74, 0.18);
+}
+
+#openAddCareTaskModalBtn:hover {
+    background: #3b375d;
+    box-shadow: 0 12px 24px rgba(45, 42, 74, 0.24);
+}
+
+#openAddCareTaskModalBtn:focus-visible {
+    outline: none;
+    box-shadow:
+        0 0 0 4px rgba(86, 82, 126, 0.2),
+        0 8px 18px rgba(45, 42, 74, 0.18);
+}
+
+.form-message {
+    min-height: 22px;
+    margin-top: 14px;
+
+    color: #6c6a7d;
+
+    font-size: 0.9rem;
+    font-weight: 500;
+
+    text-align: right;
+}
+
+#careTaskFormMessage {
+    margin: 14px 0 0;
+    min-height: 20px;
+
+    color: #6c6a7d;
+    background: transparent;
+    border: none;
+
+    font-size: 0.88rem;
+    font-weight: 500;
+    text-align: right;
+}
+
+#careTaskFormMessage.info,
+#careTaskFormMessage.error,
+#careTaskFormMessage.success {
+    color: #6c6a7d;
+    background: transparent;
+    border: none;
 }

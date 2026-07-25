@@ -11,6 +11,7 @@ import recordRoutes from "./src/routes/record.routes.js";
 import medicationRoutes from "./src/routes/medication.routes.js";
 import dashboardRoutes from "./src/routes/dashboard.routes.js";
 import searchRoutes from "./src/routes/search.routes.js";
+import careTaskRoutes from "./src/routes/careTask.routes.js";
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ app.use("/api/records", recordRoutes);
 app.use("/api/medications", medicationRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/search", searchRoutes);
+app.use("/api/care-tasks", careTaskRoutes);
 
 app.use((req, res) => {
     res.status(404).json({
