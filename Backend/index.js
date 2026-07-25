@@ -15,9 +15,11 @@ import careTaskRoutes from "./src/routes/careTask.routes.js";
 
 dotenv.config();
 
-connectDB();
-
 const app = express();
+
+if (process.env.NODE_ENV === "production") {
+    app.set("trust proxy", 1);
+}
 
 app.use(
     cors({
@@ -28,23 +30,37 @@ app.use(
 
 app.use(express.json());
 
-app.use(express.urlencoded({ extended: true }));
+app.use(
+    express.urlencoded({
+        extended: true,
+    })
+);
 
 app.use(cookieParser());
 
 app.get("/", (req, res) => {
     res.json({
-        message: "HealthVault Backend Running 🚀",
+        message:
+            "HealthVault Backend Running 🚀",
     });
 });
 
 app.use("/api/auth", authRoutes);
 app.use("/api/residents", residentRoutes);
 app.use("/api/records", recordRoutes);
-app.use("/api/medications", medicationRoutes);
-app.use("/api/dashboard", dashboardRoutes);
+app.use(
+    "/api/medications",
+    medicationRoutes
+);
+app.use(
+    "/api/dashboard",
+    dashboardRoutes
+);
 app.use("/api/search", searchRoutes);
-app.use("/api/care-tasks", careTaskRoutes);
+app.use(
+    "/api/care-tasks",
+    careTaskRoutes
+);
 
 app.use((req, res) => {
     res.status(404).json({
@@ -52,8 +68,26 @@ app.use((req, res) => {
     });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT =
+    process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+const startServer = async () => {
+    try {
+        await connectDB();
+
+        app.listen(PORT, () => {
+            console.log(
+                `Server running on port ${PORT}`
+            );
+        });
+    } catch (error) {
+        console.error(
+            "Failed to start server:",
+            error
+        );
+
+        process.exit(1);
+    }
+};
+
+startServer();
