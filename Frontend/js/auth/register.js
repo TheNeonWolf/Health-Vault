@@ -106,7 +106,7 @@ document.addEventListener(
                         "/auth/register",
                         {
                             method: "POST",
-
+                            credentials: "include",
                             body: {
                                 name,
                                 email,

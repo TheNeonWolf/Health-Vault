@@ -65,7 +65,6 @@ document.addEventListener(
                         "/auth/login",
                         {
                             method: "POST",
-
                             body: {
                                 email,
                                 password,
