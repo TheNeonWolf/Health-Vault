@@ -1,32 +1,40 @@
-import multer from 'multer';
+import multer from "multer";
 import path from "path";
+import fs from "fs";
+
+const uploadDirectory = path.resolve("uploads");
+
+if (!fs.existsSync(uploadDirectory)) {
+    fs.mkdirSync(uploadDirectory, {
+        recursive: true,
+    });
+}
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "uploads/");
+        cb(null, uploadDirectory);
     },
 
     filename: (req, file, cb) => {
-        const extension = path.extname(file.originalname);
-        
-        cb(
-            null,
-            Date.now() + extension
-        );
-    }
+        const uniqueName =
+            `${Date.now()}-${Math.round(
+                Math.random() * 1e9
+            )}${path.extname(file.originalname)}`;
+
+        cb(null, uniqueName);
+    },
 });
 
 const fileFilter = (req, file, cb) => {
-    const allowedTypes = [
-        "application/pdf",
-        "image/jpeg",
-        "image/png"
-    ];
-
-    if (allowedTypes.includes(file.mimetype)) {
+    if (file.mimetype === "application/pdf") {
         cb(null, true);
     } else {
-        cb(new Error("Only PDF and image files are allowed"), false);
+        cb(
+            new Error(
+                "Only PDF documents are allowed."
+            ),
+            false
+        );
     }
 };
 
@@ -35,7 +43,7 @@ const upload = multer({
     fileFilter,
     limits: {
         fileSize: 10 * 1024 * 1024,
-    }
+    },
 });
 
 export default upload;
